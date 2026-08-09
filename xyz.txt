@@ -1,0 +1,2 @@
+mon = mongodb://localhost:27017/job_portal
+ MjH1sF9AnKuXEALUY97seBxX7cILn10MOIeZNiFJ3o0vmC33ouQfm5nHrpMH3Z4eaRSFgB8IashLhCjc0WRJg6
