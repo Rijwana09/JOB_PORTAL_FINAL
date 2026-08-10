@@ -115,6 +115,12 @@ class AuthService {
     user.refreshToken =
       hashToken(refreshToken);
 
+    // Refresh token valid for 7 days
+    user.refreshTokenExpiresAt =
+    new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000
+    );
+
     await user.save();
 
     return {
@@ -254,11 +260,11 @@ async resendVerificationEmail(email) {
       verificationUrl,
     });
   } catch (error) {
-    /*
-    |--------------------------------------------------------------------------
-    | Roll Back Token If Email Fails
-    |--------------------------------------------------------------------------
-    */
+  /*
+  |--------------------------------------------------------------------------
+| Roll Back Token If Email Fails
+  |--------------------------------------------------------------------------
+  */
 
     user.verificationToken = null;
     user.verificationTokenExpiresAt = null;
@@ -483,6 +489,9 @@ async changePassword(userId, currentPassword, newPassword) {
     "+password +refreshToken"
   );
 
+  console.log(user);
+  
+
   if (!user) {
     throw new ApiError(
       404,
@@ -549,25 +558,32 @@ async changePassword(userId, currentPassword, newPassword) {
 
 
   /*
+|--------------------------------------------------------------------------
+| Logout
+|--------------------------------------------------------------------------
+*/
+
+async logout(userId) {
+  const user = await User.findById(userId).select(
+    "+refreshToken"
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  /*
   |--------------------------------------------------------------------------
-  | Logout
+  | Invalidate Refresh Token
   |--------------------------------------------------------------------------
   */
 
-  async logout(userId) {
-    const user = await User.findById(userId).select(
-      "+refreshToken"
-    );
+  user.refreshToken = null;
+  user.refreshTokenExpiresAt = null;
 
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
+  await user.save();
 
-    user.refreshToken = null;
-
-    await user.save();
-
-    return true;
+  return true;
   }
 }
 

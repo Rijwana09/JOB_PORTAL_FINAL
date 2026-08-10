@@ -90,4 +90,5 @@ router.post(
   authController.logout
 );
 
+
 export default router;

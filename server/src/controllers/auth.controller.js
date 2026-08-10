@@ -25,33 +25,28 @@ class AuthController {
     );
   });
 
-  /*
-  |--------------------------------------------------------------------------
-  | Login
-  |--------------------------------------------------------------------------
-  */
+/*
+|--------------------------------------------------------------------------
+| Login
+|--------------------------------------------------------------------------
+*/
 
-  login = asyncHandler(async (req, res) => {
-    const { accessToken, refreshToken, user } =
-      await authService.login(req.body);
+login = asyncHandler(async (req, res) => {
+  const { accessToken, refreshToken, user } =
+    await authService.login(req.body);
 
-    res.cookie(
-      "refreshToken",
-      refreshToken,
-      refreshCookieOptions
-    );
-
-    return res.status(200).json(
-      new ApiResponse({
-        statusCode: 200,
-        message: "Login successful",
-        data: {
-          accessToken,
-          user,
-        },
-      })
-    );
-  });
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Login successful",
+      data: {
+        accessToken,
+        refreshToken,
+        user,
+      },
+    })
+  );
+});
 
   /*
   |--------------------------------------------------------------------------
@@ -151,7 +146,7 @@ changePassword = asyncHandler(async (req, res) => {
   } = req.body;
 
   const user = await authService.changePassword(
-    req.user._id,
+    req.user.id,
     currentPassword,
     newPassword
   );
@@ -199,27 +194,47 @@ changePassword = asyncHandler(async (req, res) => {
 
     
 
-  /*
-  |--------------------------------------------------------------------------
-  | Logout
-  |--------------------------------------------------------------------------
-  */
+/*
+|--------------------------------------------------------------------------
+| Logout
+|--------------------------------------------------------------------------
+*/
 
-  logout = asyncHandler(async (req, res) => {
-    await authService.logout(req.user.id);
+logout = asyncHandler(async (req, res) => {
+  console.log(req.user);
+  
+  await authService.logout(req.user.id);
 
-    res.clearCookie(
-      "refreshToken",
-      refreshCookieOptions
-    );
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Logged out successfully",
+    })
+  );
+});
 
-    return res.status(200).json(
-      new ApiResponse({
-        statusCode: 200,
-        message: "Logout successful",
-      })
-    );
-  });
+
+  // /*
+  // |--------------------------------------------------------------------------
+  // | Logout
+  // |--------------------------------------------------------------------------
+  // */
+
+  // logout = asyncHandler(async (req, res) => {
+  //   await authService.logout(req.user.id);
+
+  //   res.clearCookie(
+  //     "refreshToken",
+  //     refreshCookieOptions
+  //   );
+
+  //   return res.status(200).json(
+  //     new ApiResponse({
+  //       statusCode: 200,
+  //       message: "Logout successful",
+  //     })
+  //   );
+  // });
 }
 
 export default new AuthController();
