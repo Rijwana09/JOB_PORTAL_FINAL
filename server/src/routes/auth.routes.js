@@ -3,7 +3,12 @@ import express from "express";
 import authController from "../controllers/auth.controller.js";
 
 import validate from "../middlewares/validate.middleware.js";
+
 import protect from "../middlewares/auth.middleware.js";
+
+// import authorizeRoles from "../middlewares/role.middleware.js";
+
+import ROLES from "../constants/roles.js";
 
 import {
   registerValidation,
@@ -78,6 +83,12 @@ router.post(
   authController.refreshToken
 );
 
+router.get(
+  "/me",
+  protect,
+  authController.getCurrentUser
+);
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes
@@ -89,6 +100,25 @@ router.post(
   protect,
   authController.logout
 );
+
+// /*
+// |--------------------------------------------------------------------------
+// | Authorization Test Route
+// |--------------------------------------------------------------------------
+// */
+
+//   router.get(
+//     "/admin-test",
+//     protect,
+//     authorizeRoles(ROLES.ADMIN),
+//     (req, res) => {
+//       res.status(200).json({
+//         success: true,
+//         message: "Admin authorization successful",
+//         user: req.user,
+//       });
+//     }
+//   );
 
 
 export default router;

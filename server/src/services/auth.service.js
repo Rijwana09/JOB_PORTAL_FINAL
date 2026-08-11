@@ -377,12 +377,61 @@ async forgotPassword(email) {
     if (!user) {
       throw new ApiError(401, "User not found");
     }
+    
+  /*
+  |--------------------------------------------------------------------------
+  | Check Stored Refresh Token Expiration
+  |--------------------------------------------------------------------------
+  */
+
+    if (!user.refreshTokenExpiresAt) {
+      throw new ApiError(
+        401,
+        "Refresh token is invalid or expired"
+      );
+    }
+
+    if(user.refreshTokenExpiresAt <= new Date()) {
+      user.refreshToken = null;
+      user.refreshTokenExpiresAt = null;
+
+      await user.save();
+
+      throw new ApiError(
+        401,
+        "Refresh token is invalid or expired"
+      );
+    }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Compare Refresh Token
+  |--------------------------------------------------------------------------
+  */
 
     const hashedToken = hashToken(refreshToken);
 
     if (user.refreshToken !== hashedToken) {
-      throw new ApiError(401, "Invalid refresh token");
+
+      // Refresh token reuse detected.
+      // Invalidate the current refresh session.
+
+      user.refreshToken = null;
+      user.refreshTokenExpiresAt = null;
+
+      await user.save();
+
+      throw new ApiError(
+        401,
+        "Refresh token reuse detected"
+      );
     }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generate New Tokens
+  |--------------------------------------------------------------------------
+  */
 
     const newAccessToken =
       generateAccessToken(user);
@@ -390,8 +439,25 @@ async forgotPassword(email) {
     const newRefreshToken =
       generateRefreshToken(user);
 
-    user.refreshToken =
-      hashToken(newRefreshToken);
+  /*
+  |--------------------------------------------------------------------------
+  | Rotate Refresh Token
+  |--------------------------------------------------------------------------
+  */
+
+  user.refreshToken =
+    hashToken(newRefreshToken);
+
+  /*
+  |--------------------------------------------------------------------------
+  | Update Refresh Token Expiration
+  |--------------------------------------------------------------------------
+  */
+
+  user.refreshTokenExpiresAt =
+      new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000
+      );
 
     await user.save();
 

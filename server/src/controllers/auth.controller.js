@@ -167,32 +167,38 @@ changePassword = asyncHandler(async (req, res) => {
   */
 
   refreshToken = asyncHandler(async (req, res) => {
-    const refreshToken =
-      req.cookies.refreshToken;
+  const { refreshToken } = req.body;
 
-    const tokens =
-      await authService.refreshAccessToken(
-        refreshToken
-      );
-
-    res.cookie(
-      "refreshToken",
-      tokens.refreshToken,
-      refreshCookieOptions
+  const tokens =
+    await authService.refreshAccessToken(
+      refreshToken
     );
 
-    return res.status(200).json(
-      new ApiResponse({
-        statusCode: 200,
-        message: "Access token refreshed successfully",
-        data: {
-          accessToken: tokens.accessToken,
-        },
-      })
-    );
-  });
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Access token refreshed successfully",
+      data: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      },
+    })
+  );
+});
 
-    
+ //me
+  getCurrentUser = asyncHandler(async (req, res) => {
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Current user fetched successfully",
+      data: {
+        user: req.user,
+      },
+    })
+  );
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -201,8 +207,7 @@ changePassword = asyncHandler(async (req, res) => {
 */
 
 logout = asyncHandler(async (req, res) => {
-  console.log(req.user);
-  
+
   await authService.logout(req.user.id);
 
   return res.status(200).json(
@@ -212,29 +217,7 @@ logout = asyncHandler(async (req, res) => {
     })
   );
 });
-
-
-  // /*
-  // |--------------------------------------------------------------------------
-  // | Logout
-  // |--------------------------------------------------------------------------
-  // */
-
-  // logout = asyncHandler(async (req, res) => {
-  //   await authService.logout(req.user.id);
-
-  //   res.clearCookie(
-  //     "refreshToken",
-  //     refreshCookieOptions
-  //   );
-
-  //   return res.status(200).json(
-  //     new ApiResponse({
-  //       statusCode: 200,
-  //       message: "Logout successful",
-  //     })
-  //   );
-  // });
+  
 }
 
 export default new AuthController();

@@ -16,8 +16,6 @@ const protect = asyncHandler(async (req, res, next) => {
     authHeader.startsWith("Bearer ")
   ) {
     token = authHeader.split(" ")[1];
-    // console.log(token);
-    
   }
 
   if (!token) {
@@ -28,7 +26,6 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 
   let decoded;
-
   try {
     decoded = jwt.verify(
       token,
@@ -51,7 +48,7 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 
   req.user = {
-    id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
