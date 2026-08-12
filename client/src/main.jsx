@@ -3,11 +3,16 @@ import ReactDOM from "react-dom/client";
 
 import "./index.css";
 
+import "./api/axiosInterceptor";
+
 import App from "./App";
 
 import { Toaster } from "react-hot-toast";
 
 import { ThemeProvider } from "./context/ThemeContext";
+
+import { AuthProvider } from "./context/AuthContext";
+
 
 import ErrorBoundary from "./components/Error/ErrorBoundary";
 
@@ -20,12 +25,16 @@ ReactDOM.createRoot(
 
       <ThemeProvider>
 
+        <AuthProvider>
+
         <App />
 
         <Toaster
           position="top-right"
           reverseOrder={false}
         />
+
+        </AuthProvider>
 
       </ThemeProvider>
 
