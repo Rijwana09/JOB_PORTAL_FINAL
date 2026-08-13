@@ -36,6 +36,20 @@ router.get(
   jobController.getAllJobs
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| Get My Jobs
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/my-jobs",
+  protect,
+  roleMiddleware(ROLES.RECRUITER),
+  jobController.getMyJobs
+);
+
 /*
 |--------------------------------------------------------------------------
 | Get Single Job
@@ -57,19 +71,6 @@ router.get(
 
 /*
 |--------------------------------------------------------------------------
-| Get My Jobs
-|--------------------------------------------------------------------------
-*/
-
-router.get(
-  "/my-jobs",
-  protect,
-  roleMiddleware(ROLES.RECRUITER),
-  jobController.getMyJobs
-);
-
-/*
-|--------------------------------------------------------------------------
 | Create Job
 |--------------------------------------------------------------------------
 */
@@ -81,36 +82,6 @@ router.post(
   createJobValidation,
   validate,
   jobController.createJob
-);
-
-/*
-|--------------------------------------------------------------------------
-| Update Own Job
-|--------------------------------------------------------------------------
-*/
-
-router.patch(
-  "/:id",
-  protect,
-  roleMiddleware(ROLES.RECRUITER),
-  updateJobValidation,
-  validate,
-  jobController.updateJob
-);
-
-/*
-|--------------------------------------------------------------------------
-| Delete Own Job
-|--------------------------------------------------------------------------
-*/
-
-router.delete(
-  "/:id",
-  protect,
-  roleMiddleware(ROLES.RECRUITER),
-  jobIdValidation,
-  validate,
-  jobController.deleteJob
 );
 
 /*
@@ -148,5 +119,36 @@ router.delete(
   validate,
   jobController.adminDeleteJob
 );
+
+/*
+|--------------------------------------------------------------------------
+| Update Own Job
+|--------------------------------------------------------------------------
+*/
+
+router.patch(
+  "/:id",
+  protect,
+  roleMiddleware(ROLES.RECRUITER),
+  updateJobValidation,
+  validate,
+  jobController.updateJob
+);
+
+/*
+|--------------------------------------------------------------------------
+| Delete Own Job
+|--------------------------------------------------------------------------
+*/
+
+router.delete(
+  "/:id",
+  protect,
+  roleMiddleware(ROLES.RECRUITER),
+  jobIdValidation,
+  validate,
+  jobController.deleteJob
+);
+
 
 export default router;

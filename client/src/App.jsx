@@ -99,7 +99,39 @@ function App() {
           </Route>
 
           {/* Recruiter */}
-          <Route element={
+
+           <Route
+            element={
+              <RoleRoute
+                allowedRoles={[ROLES.RECRUITER]}
+              />
+            }
+          >
+
+            <Route
+              path="/recruiter/dashboard"
+              element={
+                <RecruiterDashboard />
+              }
+            />
+
+            <Route
+              path="/recruiter/jobs/create"
+              element={
+                <CreateJob />
+              }
+            />
+
+            <Route
+              path="/recruiter/jobs/:id/edit"
+              element={
+                <EditJob />
+              }
+            />
+
+          </Route>
+
+          {/* <Route element={
             <RoleRoute
               allowedRoles={[ROLES.RECRUITER]}
             />
@@ -123,7 +155,7 @@ function App() {
               }
             />
             
-          </Route>
+          </Route> */}
 
 
           {/* Admin */}
