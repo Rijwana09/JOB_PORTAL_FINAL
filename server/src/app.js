@@ -8,6 +8,8 @@ import rateLimit from "express-rate-limit";
 
 import healthRoutes from "./routes/healthRoutes.js";
 
+import jobRoutes from "./routes/job.routes.js";
+
 import notFound from "./middlewares/notFound.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -33,6 +35,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan("dev"));
+
+app.use("/api/v1/jobs",jobRoutes);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

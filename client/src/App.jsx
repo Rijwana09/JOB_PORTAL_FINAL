@@ -9,6 +9,10 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import Jobs from "./pages/Jobs/Jobs";
+import JobDetails from "./pages/Jobs/JobDetails";
+
+
 import NotFound from "./pages/NotFound";
 
 import Unauthorized from "./pages/Unauthorized";
@@ -18,16 +22,24 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import RoleRoute from "./components/Auth/RoleRoute";
 
 import StudentDashboard from "./pages/Dashboard/StudentDashboard";
-import RecruiterDashboard from "./pages/Dashboard/RecruiterDashboard";
+
+import RecruiterDashboard from "./pages/Recruiter/RecruiterDashboard"
+
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 
 import ROLES from "./constants/roles";
+
+import CreateJob from "./pages/Recruiter/CreateJob";
+
+import EditJob from "./pages/Recruiter/EditJob";
 
 // import Dashboard from "./pages/Dashboard/Dashboard";
 
 
 function App() {
   return (
+  
+    
     <BrowserRouter>
       <Routes>
 
@@ -38,6 +50,19 @@ function App() {
             path="/"
             element={<Home />}
           />
+
+          {/* Jobs */}
+          <Route
+            path="/jobs"
+            element={<Jobs />}
+          />
+
+          {/* Single Job */}
+          <Route
+            path="/jobs/:id"
+            element={<JobDetails />}
+          />
+
         </Route>
 
         <Route
@@ -83,6 +108,21 @@ function App() {
               path="/recruiter/dashboard"
               element={<RecruiterDashboard />}
             />
+
+             <Route
+              path="/recruiter/jobs/create"
+              element={
+                <CreateJob />
+              }
+            />
+
+            <Route
+              path="/recruiter/jobs/:id/edit"
+              element={
+                <EditJob />
+              }
+            />
+            
           </Route>
 
 
@@ -118,6 +158,7 @@ function App() {
 
       </Routes>
     </BrowserRouter>
+    
   );
 }
 
