@@ -80,16 +80,16 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
-    verificationToken: {
-      type: String,
-      default: null,
-      select: false,
-    },
+    // verificationToken: {
+    //   type: String,
+    //   default: null,
+    //   select: false,
+    // },
 
-    verificationTokenExpiresAt: {
-      type: Date,
-      default: null,
-    },
+    // verificationTokenExpiresAt: {
+    //   type: Date,
+    //   default: null,
+    // },
 
     passwordResetToken: {
       type: String,

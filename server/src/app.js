@@ -13,7 +13,8 @@ import jobRoutes from "./routes/job.routes.js";
 import notFound from "./middlewares/notFound.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
-
+import studentRoutes from "./routes/student.routes.js";
+import applicationRoutes from "./routes/application.routes.js";
 
 const app = express();
 
@@ -54,6 +55,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/health", healthRoutes);
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/students", studentRoutes);
+app.use("/api/v1/applications", applicationRoutes);
 
 app.use(notFound);
 

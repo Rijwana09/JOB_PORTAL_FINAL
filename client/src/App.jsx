@@ -21,7 +21,7 @@ import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import RoleRoute from "./components/Auth/RoleRoute";
 
-import StudentDashboard from "./pages/Dashboard/StudentDashboard";
+
 
 import RecruiterDashboard from "./pages/Recruiter/RecruiterDashboard"
 
@@ -33,7 +33,8 @@ import CreateJob from "./pages/Recruiter/CreateJob";
 
 import EditJob from "./pages/Recruiter/EditJob";
 
-// import Dashboard from "./pages/Dashboard/Dashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
+
 
 
 function App() {
@@ -76,13 +77,6 @@ function App() {
         />
 
         {/* Protected Routes */}
-
-        {/* <Route element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-        </Route> */}
 
         <Route element={<ProtectedRoute />}>
 
@@ -130,33 +124,6 @@ function App() {
             />
 
           </Route>
-
-          {/* <Route element={
-            <RoleRoute
-              allowedRoles={[ROLES.RECRUITER]}
-            />
-          }>
-            <Route
-              path="/recruiter/dashboard"
-              element={<RecruiterDashboard />}
-            />
-
-             <Route
-              path="/recruiter/jobs/create"
-              element={
-                <CreateJob />
-              }
-            />
-
-            <Route
-              path="/recruiter/jobs/:id/edit"
-              element={
-                <EditJob />
-              }
-            />
-            
-          </Route> */}
-
 
           {/* Admin */}
           <Route element={

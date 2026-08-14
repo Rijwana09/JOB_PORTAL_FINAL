@@ -24,6 +24,9 @@ const Jobs = () => {
   const [search, setSearch] =
     useState("");
 
+  const [submittedSearch, setSubmittedSearch] =
+    useState("");
+
   const [location, setLocation] =
     useState("");
 
@@ -61,15 +64,16 @@ const Jobs = () => {
       setLoading(true);
 
       const response = await getJobs({
-        search: search || undefined,
-        location:
-          location || undefined,
-        jobType:
-          jobType || undefined,
-        workMode:
-          workMode || undefined,
-        experienceLevel:
-          experienceLevel || undefined,
+        search:submittedSearch || undefined,
+
+        location:location || undefined,
+
+        jobType:jobType || undefined,
+
+        workMode:workMode || undefined,
+
+        experienceLevel:experienceLevel || undefined,
+
         page,
         limit: 10,
       });
@@ -102,6 +106,7 @@ const Jobs = () => {
     fetchJobs();
   }, [
     page,
+    submittedSearch,
     location,
     jobType,
     workMode,
@@ -119,22 +124,32 @@ const Jobs = () => {
 
     setPage(1);
 
-    fetchJobs();
+    setSubmittedSearch(search.trim());
   };
 
-  /*
-  |--------------------------------------------------------------------------
-  | Filter Change
-  |--------------------------------------------------------------------------
-  */
+  // /*
+  // |--------------------------------------------------------------------------
+  // | Filter Change
+  // |--------------------------------------------------------------------------
+  // */
 
-  const handleFilterChange = (
-    setter
-  ) => {
-    setter(
-      event.target.value
-    );
+  // const handleFilterChange = (
+  //   setter
+  // ) => {
+  //   setter(
+  //     event.target.value
+  //   );
 
+  //   setPage(1);
+  // };
+
+  const clearFilters = () => {
+    setSearch("");
+    setSubmittedSearch("");
+    setLocation("");
+    setJobType("");
+    setWorkMode("");
+    setExperienceLevel("");
     setPage(1);
   };
 
@@ -328,6 +343,14 @@ const Jobs = () => {
                 </option>
               </select>
             </div>
+
+            <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-6 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+              >
+                Clear Filters
+            </button>
 
           </aside>
 

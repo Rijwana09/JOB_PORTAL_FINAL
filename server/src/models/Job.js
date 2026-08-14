@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-// import ROLES from "../constants/roles.js";
-
 const { Schema } = mongoose;
 
 const jobSchema = new Schema(

@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import {
   getMyJobs,
   deleteJob,
+  updateJob,
 } from "../../api/jobApi";
 
 const RecruiterDashboard = () => {
@@ -98,6 +99,37 @@ const RecruiterDashboard = () => {
       );
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleStatusChange = async (
+    jobId,
+    newStatus
+  ) => {
+    try {
+      await updateJob(jobId, {
+        status: newStatus,
+      });
+
+      toast.success(
+        "Job status updated successfully"
+      );
+
+      setJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job._id === jobId
+            ? {
+                ...job,
+                status: newStatus,
+              }
+            : job
+        )
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update job status"
+      );
     }
   };
 
@@ -288,13 +320,27 @@ const RecruiterDashboard = () => {
                           {job.jobType}
                         </td>
 
-                        <td className="px-6 py-5">
+                       <select
+                          value={job.status}
+                          onChange={(e) =>
+                            handleStatusChange(
+                              job._id,
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="draft">
+                            Draft
+                          </option>
 
-                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium">
-                            {job.status}
-                          </span>
+                          <option value="published">
+                            Published
+                          </option>
 
-                        </td>
+                          <option value="closed">
+                            Closed
+                          </option>
+                        </select>
 
                         <td className="px-6 py-5">
 
