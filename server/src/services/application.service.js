@@ -92,6 +92,79 @@ class ApplicationService {
 
   /*
 |--------------------------------------------------------------------------
+| Get Recruiter's Applications
+|--------------------------------------------------------------------------
+*/
+
+async getRecruiterApplications(
+  recruiterId,
+  filters = {}
+) {
+  const {
+    status,
+  } = filters;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Find recruiter's jobs
+  |--------------------------------------------------------------------------
+  */
+
+  const jobs = await Job.find({
+    recruiter: recruiterId,
+  }).select("_id");
+
+  const jobIds = jobs.map(
+    (job) => job._id
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | Build Application Query
+  |--------------------------------------------------------------------------
+  */
+
+  const query = {
+    job: {
+      $in: jobIds,
+    },
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | Status Filter
+  |--------------------------------------------------------------------------
+  */
+
+  if (status) {
+    query.status = status;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Fetch Applications
+  |--------------------------------------------------------------------------
+  */
+
+  const applications =
+    await Application.find(query)
+      .populate(
+        "student",
+        "name email avatar"
+      )
+      .populate(
+        "job",
+        "title company location jobType workMode experienceLevel salary status applicationDeadline"
+      )
+      .sort({
+        createdAt: -1,
+      });
+
+  return applications;
+}
+
+  /*
+|--------------------------------------------------------------------------
 | Get Application By ID
 |--------------------------------------------------------------------------
 */

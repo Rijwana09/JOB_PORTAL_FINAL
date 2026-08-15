@@ -26,6 +26,19 @@ router.get(
   applicationController.getStudentDashboard
 );
 
+/*
+|--------------------------------------------------------------------------
+| Recruiter - Get Applications
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/recruiter",
+  authMiddleware,
+  authorizeRoles("recruiter"),
+  applicationController.getRecruiterApplications
+);
+
 router.get(
   "/:applicationId",
   authMiddleware,

@@ -58,6 +58,35 @@ class ApplicationController {
     }
   );
 
+  /*
+|--------------------------------------------------------------------------
+| Get Recruiter's Applications
+|--------------------------------------------------------------------------
+*/
+
+getRecruiterApplications =
+  asyncHandler(
+    async (req, res) => {
+      const applications =
+        await applicationService
+          .getRecruiterApplications(
+            req.user.id,
+            req.query
+          );
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: applications,
+            message:
+              "Recruiter's applications fetched successfully",
+          })
+        );
+    }
+  );
+
 /*
 |--------------------------------------------------------------------------
 | Get Application By ID
