@@ -163,6 +163,31 @@ async getRecruiterApplications(
   return applications;
 }
 
+  async getRecruiterApplicationById(applicationId, recruiterId) {
+    const application = await Application.findById(applicationId)
+      .populate("job", "title company location description salary")
+      .populate("applicant", "name email");
+
+    if (!application) {
+      throw new ApiError(404, "Application not found");
+    }
+
+    // Check whether this job belongs to the logged-in recruiter
+    const job = await Job.findOne({
+      _id: application.job._id,
+      recruiter: recruiterId,
+    });
+
+    if (!job) {
+      throw new ApiError(
+        403,
+        "You are not authorized to view this application"
+      );
+    }
+
+    return application;
+  }
+
   /*
 |--------------------------------------------------------------------------
 | Get Application By ID

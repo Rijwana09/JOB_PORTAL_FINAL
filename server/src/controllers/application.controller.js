@@ -64,28 +64,45 @@ class ApplicationController {
 |--------------------------------------------------------------------------
 */
 
-getRecruiterApplications =
-  asyncHandler(
-    async (req, res) => {
-      const applications =
-        await applicationService
-          .getRecruiterApplications(
-            req.user.id,
-            req.query
-          );
+  getRecruiterApplications =
+    asyncHandler(
+      async (req, res) => {
+        const applications =
+          await applicationService
+            .getRecruiterApplications(
+              req.user.id,
+              req.query
+            );
 
-      return res
-        .status(200)
-        .json(
-          new ApiResponse({
-            statusCode: 200,
-            data: applications,
-            message:
-              "Recruiter's applications fetched successfully",
-          })
-        );
-    }
-  );
+        return res
+          .status(200)
+          .json(
+            new ApiResponse({
+              statusCode: 200,
+              data: applications,
+              message:
+                "Recruiter's applications fetched successfully",
+            })
+          );
+      }
+    );
+
+    async getRecruiterApplicationById(req, res) {
+    const { applicationId } = req.params;
+    const recruiterId = req.user._id;
+
+    const application =
+      await applicationService.getRecruiterApplicationById(
+        applicationId,
+        recruiterId
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Application details fetched successfully",
+      data: application,
+    });
+  }
 
 /*
 |--------------------------------------------------------------------------

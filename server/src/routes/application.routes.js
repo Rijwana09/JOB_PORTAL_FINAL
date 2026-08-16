@@ -40,6 +40,13 @@ router.get(
 );
 
 router.get(
+  "/recruiter/:applicationId",
+  authMiddleware,
+  authorizeRoles("recruiter"),
+  applicationController.getRecruiterApplicationById
+);
+
+router.get(
   "/:applicationId",
   authMiddleware,
   authorizeRoles("student"),
