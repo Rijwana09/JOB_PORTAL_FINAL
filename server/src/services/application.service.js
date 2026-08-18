@@ -162,31 +162,60 @@ async getRecruiterApplications(
 
   return applications;
 }
+  /*
+|--------------------------------------------------------------------------
+| Get Recruiter's Application By ID
+|--------------------------------------------------------------------------
+*/
 
-  async getRecruiterApplicationById(applicationId, recruiterId) {
-    const application = await Application.findById(applicationId)
-      .populate("job", "title company location description salary")
-      .populate("applicant", "name email");
+async getRecruiterApplicationById(
+  applicationId,
+  recruiterId
+) {
+  const application =
+    await Application.findById(applicationId)
+      .populate(
+        "student",
+        "name email avatar"
+      )
+      .populate(
+        "job",
+        "title company location jobType workMode experienceLevel salary status applicationDeadline recruiter"
+      )
 
-    if (!application) {
-      throw new ApiError(404, "Application not found");
-    }
-
-    // Check whether this job belongs to the logged-in recruiter
-    const job = await Job.findOne({
-      _id: application.job._id,
-      recruiter: recruiterId,
-    });
-
-    if (!job) {
-      throw new ApiError(
-        403,
-        "You are not authorized to view this application"
-      );
-    }
-
-    return application;
+  if (!application) {
+    throw new ApiError(
+      404,
+      "Application not found"
+    );
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Check Recruiter Ownership
+  |--------------------------------------------------------------------------
+  */
+
+  const jobs = await Job.find({
+    recruiter: recruiterId,
+  }).select("_id");
+
+  const jobIds = jobs.map(
+    (job) => job._id.toString()
+  );
+
+  const applicationJobId =
+    application.job._id.toString();
+
+  if (!jobIds.includes(applicationJobId)) {
+    throw new ApiError(
+      403,
+      "You are not authorized to view this application"
+    );
+  }
+
+  return application;
+}
 
   /*
 |--------------------------------------------------------------------------
@@ -213,6 +242,47 @@ async getRecruiterApplications(
           "Application not found"
         );
       }
+
+      return application;
+    }
+    //update application status
+    async updateApplicationStatus(
+      applicationId,
+      recruiterId,
+      status
+    ) {
+      const application = await Application.findById(applicationId);
+
+      if (!application) {
+        throw new ApiError(404, "Application not found");
+      }
+
+      const job = await Job.findOne({
+        _id: application.job,
+        recruiter: recruiterId,
+      });
+
+      if (!job) {
+        throw new ApiError(
+          403,
+          "You are not authorized to update this application"
+        );
+      }
+
+      application.status = status;
+
+      await application.save();
+
+      await application.populate([
+        {
+          path: "job",
+          select: "title company location",
+        },
+        {
+          path: "student",
+          select: "name email avatar",
+        },
+      ]);
 
       return application;
     }

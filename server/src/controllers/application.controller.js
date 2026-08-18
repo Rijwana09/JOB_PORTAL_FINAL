@@ -1,7 +1,9 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 import applicationService from "../services/application.service.js";
+
 
 class ApplicationController {
 
@@ -87,22 +89,64 @@ class ApplicationController {
       }
     );
 
-    async getRecruiterApplicationById(req, res) {
-    const { applicationId } = req.params;
-    const recruiterId = req.user._id;
+    getRecruiterApplicationById = asyncHandler(
+      async (req, res) => {
+        const application =
+          await applicationService.getRecruiterApplicationById(
+            req.params.applicationId,
+            req.user.id
+          );
 
-    const application =
-      await applicationService.getRecruiterApplicationById(
-        applicationId,
-        recruiterId
-      );
+        return res
+          .status(200)
+          .json(
+            new ApiResponse({
+              statusCode: 200,
+              data: application,
+              message:
+                "Application details fetched successfully",
+            })
+          );
+      }
+    );
 
-    res.status(200).json({
-      success: true,
-      message: "Application details fetched successfully",
-      data: application,
-    });
-  }
+    /*
+|--------------------------------------------------------------------------
+| Update Recruiter's Application Status
+|--------------------------------------------------------------------------
+*/
+
+updateApplicationStatus = asyncHandler(
+    async (req, res) => {
+      const { applicationId } = req.params;
+      const { status } = req.body;
+
+      if (!status) {
+        throw new ApiError(
+          400,
+          "Application status is required"
+        );
+      }
+
+      const application =
+        await applicationService.updateApplicationStatus(
+          applicationId,
+          req.user.id,
+          status
+        );
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: application,
+            message:
+              "Application status updated successfully",
+          })
+        );
+    }
+  );
 
 /*
 |--------------------------------------------------------------------------

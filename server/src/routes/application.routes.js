@@ -46,6 +46,13 @@ router.get(
   applicationController.getRecruiterApplicationById
 );
 
+router.patch(
+  "/recruiter/:applicationId/status",
+  authMiddleware,
+  authorizeRoles("recruiter"),
+  applicationController.updateApplicationStatus
+);
+
 router.get(
   "/:applicationId",
   authMiddleware,
