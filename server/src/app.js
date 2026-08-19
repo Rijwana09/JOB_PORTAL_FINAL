@@ -15,7 +15,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
-
+import notificationRoutes from "./routes/notification.routes.js";
 const app = express();
 
 app.use(
@@ -57,6 +57,7 @@ app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/applications", applicationRoutes);
+app.use("/api/v1/notifications",notificationRoutes);
 
 app.use(notFound);
 

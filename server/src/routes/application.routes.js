@@ -28,6 +28,19 @@ router.get(
 
 /*
 |--------------------------------------------------------------------------
+| Recruiter - Dashboard
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/recruiter/dashboard",
+  authMiddleware,
+  authorizeRoles("recruiter"),
+  applicationController.getRecruiterDashboard
+);
+
+/*
+|--------------------------------------------------------------------------
 | Recruiter - Get Applications
 |--------------------------------------------------------------------------
 */
@@ -53,6 +66,41 @@ router.patch(
   applicationController.updateApplicationStatus
 );
 
+/*
+|--------------------------------------------------------------------------
+| Admin - Applications
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/admin",
+  authMiddleware,
+  authorizeRoles("admin"),
+  applicationController.getAllApplications
+);
+
+router.get(
+  "/admin/statistics",
+  authMiddleware,
+  authorizeRoles("admin"),
+  applicationController
+    .getAdminApplicationStatistics
+);
+
+router.get(
+  "/admin/:applicationId",
+  authMiddleware,
+  authorizeRoles("admin"),
+  applicationIdValidator,
+  validate,
+  applicationController.getAdminApplicationById
+);
+
+/*
+|--------------------------------------------------------------------------
+| Student - Application Details
+|--------------------------------------------------------------------------
+*/
 router.get(
   "/:applicationId",
   authMiddleware,

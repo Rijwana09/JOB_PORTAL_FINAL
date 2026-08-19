@@ -202,6 +202,131 @@ updateApplicationStatus = asyncHandler(
     }
   );
 
+  /*
+|--------------------------------------------------------------------------
+| Get Recruiter Dashboard
+|--------------------------------------------------------------------------
+*/
+
+getRecruiterDashboard = asyncHandler(
+  async (req, res) => {
+    const dashboard =
+      await applicationService.getRecruiterDashboard(
+        req.user.id
+      );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse({
+          statusCode: 200,
+          data: dashboard,
+          message:
+            "Recruiter dashboard fetched successfully",
+        })
+      );
+  }
+);
+
+/*
+|--------------------------------------------------------------------------
+| Admin - Get All Applications
+|--------------------------------------------------------------------------
+*/
+
+getAllApplications = asyncHandler(
+  async (req, res) => {
+    const { status } = req.query;
+
+    const allowedStatuses = [
+      "applied",
+      "shortlisted",
+      "rejected",
+      "hired",
+    ];
+
+    if (
+      status &&
+      !allowedStatuses.includes(status)
+    ) {
+      throw new ApiError(
+        400,
+        "Invalid application status"
+      );
+    }
+
+    const applications =
+      await applicationService.getAllApplications(
+        req.query
+      );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse({
+          statusCode: 200,
+          data: applications,
+          message:
+            "All applications fetched successfully",
+        })
+      );
+  }
+);
+
+/*
+|--------------------------------------------------------------------------
+| Admin - Get Application By ID
+|--------------------------------------------------------------------------
+*/
+
+getAdminApplicationById =
+  asyncHandler(
+    async (req, res) => {
+      const application =
+        await applicationService
+          .getAdminApplicationById(
+            req.params.applicationId
+          );
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: application,
+            message:
+              "Application details fetched successfully",
+          })
+        );
+    }
+  );
+
+  /*
+|--------------------------------------------------------------------------
+| Admin - Application Statistics
+|--------------------------------------------------------------------------
+*/
+
+getAdminApplicationStatistics =
+  asyncHandler(
+    async (req, res) => {
+      const statistics =
+        await applicationService
+          .getAdminApplicationStatistics();
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: statistics,
+            message:
+              "Application statistics fetched successfully",
+          })
+        );
+    }
+  );
+
 }
 
 export default new ApplicationController();
