@@ -31,6 +31,62 @@ class NotificationController {
         );
     }
   );
+
+  /*
+|--------------------------------------------------------------------------
+| Mark Notification As Read
+|--------------------------------------------------------------------------
+*/
+
+  markNotificationAsRead = asyncHandler(
+    async (req, res) => {
+      const notification =
+        await notificationService.markNotificationAsRead(
+          req.params.notificationId,
+          req.user.id
+        );
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: notification,
+            message:
+              "Notification marked as read",
+          })
+        );
+    }
+  );
+
+  /*
+|--------------------------------------------------------------------------
+| Mark All Notifications As Read
+|--------------------------------------------------------------------------
+*/
+
+markAllNotificationsAsRead =
+  asyncHandler(
+    async (req, res) => {
+      const result =
+        await notificationService
+          .markAllNotificationsAsRead(
+            req.user.id
+          );
+
+      return res
+        .status(200)
+        .json(
+          new ApiResponse({
+            statusCode: 200,
+            data: result,
+            message:
+              "All notifications marked as read",
+          })
+        );
+    }
+  );
+
 }
 
 export default new NotificationController();

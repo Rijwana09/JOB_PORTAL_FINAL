@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import Application from "../models/Application.js";
 import Job from "../models/Job.js";
 import ApiError from "../utils/ApiError.js";
 import Notification from "../models/Notification.js";
+
 
 class ApplicationService {
 
@@ -75,23 +77,125 @@ class ApplicationService {
 |--------------------------------------------------------------------------
 */
 
-  async getMyApplications(studentId) {
+  async getMyApplications(
+    studentId,
+    filters = {}
+  ) {
+    const {
+      status,
+      sort = "latest",
+      page = 1,
+      limit = 10,
+    } = filters;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Build Query
+    |--------------------------------------------------------------------------
+    */
+
+    const query = {
+      student: studentId,
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Status Filter
+    |--------------------------------------------------------------------------
+    */
+
+    if (status) {
+      query.status = status;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+    const currentPage =
+      Math.max(Number(page) || 1, 1);
+
+    const itemsPerPage =
+      Math.min(
+        Math.max(Number(limit) || 10, 1),
+        100
+      );
+
+    const skip =
+      (currentPage - 1) *
+      itemsPerPage;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sort
+    |--------------------------------------------------------------------------
+    */
+
+    const sortOption =
+      sort === "oldest"
+        ? { createdAt: 1 }
+        : { createdAt: -1 };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Total Count
+    |--------------------------------------------------------------------------
+    */
+
+    const totalApplications =
+      await Application.countDocuments(
+        query
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fetch Applications
+    |--------------------------------------------------------------------------
+    */
+
     const applications =
-      await Application.find({
-        student: studentId,
-      })
+      await Application.find(query)
         .populate(
           "job",
           "title company location jobType workMode experienceLevel salary status applicationDeadline"
         )
-        .sort({
-          createdAt: -1,
-        });
+        .sort(sortOption)
+        .skip(skip)
+        .limit(itemsPerPage);
 
-    return applications;
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination Metadata
+    |--------------------------------------------------------------------------
+    */
+
+    const totalPages =
+      Math.ceil(
+        totalApplications /
+          itemsPerPage
+      );
+
+    return {
+      applications,
+
+      pagination: {
+        currentPage,
+        itemsPerPage,
+        totalApplications,
+        totalPages,
+
+        hasNextPage:
+          currentPage < totalPages,
+
+        hasPreviousPage:
+          currentPage > 1,
+      },
+    };
   }
 
-  /*
+/*
 |--------------------------------------------------------------------------
 | Get Recruiter's Applications
 |--------------------------------------------------------------------------
@@ -103,11 +207,14 @@ async getRecruiterApplications(
 ) {
   const {
     status,
+    sort = "latest",
+    page = 1,
+    limit = 10,
   } = filters;
 
   /*
   |--------------------------------------------------------------------------
-  | Find recruiter's jobs
+  | Find Recruiter's Jobs
   |--------------------------------------------------------------------------
   */
 
@@ -143,6 +250,47 @@ async getRecruiterApplications(
 
   /*
   |--------------------------------------------------------------------------
+  | Pagination
+  |--------------------------------------------------------------------------
+  */
+
+  const currentPage =
+    Math.max(Number(page) || 1, 1);
+
+  const itemsPerPage =
+    Math.min(
+      Math.max(Number(limit) || 10, 1),
+      100
+    );
+
+  const skip =
+    (currentPage - 1) *
+    itemsPerPage;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Sort
+  |--------------------------------------------------------------------------
+  */
+
+  const sortOption =
+    sort === "oldest"
+      ? { createdAt: 1 }
+      : { createdAt: -1 };
+
+  /*
+  |--------------------------------------------------------------------------
+  | Total Count
+  |--------------------------------------------------------------------------
+  */
+
+  const totalApplications =
+    await Application.countDocuments(
+      query
+    );
+
+  /*
+  |--------------------------------------------------------------------------
   | Fetch Applications
   |--------------------------------------------------------------------------
   */
@@ -157,11 +305,38 @@ async getRecruiterApplications(
         "job",
         "title company location jobType workMode experienceLevel salary status applicationDeadline"
       )
-      .sort({
-        createdAt: -1,
-      });
+      .sort(sortOption)
+      .skip(skip)
+      .limit(itemsPerPage);
 
-  return applications;
+  /*
+  |--------------------------------------------------------------------------
+  | Pagination Metadata
+  |--------------------------------------------------------------------------
+  */
+
+  const totalPages =
+    Math.ceil(
+      totalApplications /
+        itemsPerPage
+    );
+
+  return {
+    applications,
+
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalApplications,
+      totalPages,
+
+      hasNextPage:
+        currentPage < totalPages,
+
+      hasPreviousPage:
+        currentPage > 1,
+    },
+  };
 }
   /*
 |--------------------------------------------------------------------------
@@ -257,6 +432,77 @@ async getApplicationById(
     return application;
   }
 
+/*
+|--------------------------------------------------------------------------
+| Withdraw Student Application
+|--------------------------------------------------------------------------
+*/
+
+  async withdrawApplication(
+    applicationId,
+    studentId
+  ) {
+    const application =
+      await Application.findOne({
+        _id: applicationId,
+        student: studentId,
+      });
+
+    if (!application) {
+      throw new ApiError(
+        404,
+        "Application not found"
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Check Current Application Status
+    |--------------------------------------------------------------------------
+    */
+
+    if (application.status === "withdrawn") {
+      throw new ApiError(
+        400,
+        "Application has already been withdrawn"
+      );
+    }
+
+    if (
+      application.status === "rejected" ||
+      application.status === "hired"
+    ) {
+      throw new ApiError(
+        400,
+        `You cannot withdraw an application that is ${application.status}`
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Withdraw Application
+    |--------------------------------------------------------------------------
+    */
+
+    application.status = "withdrawn";
+
+    await application.save();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Populate Application Data
+    |--------------------------------------------------------------------------
+    */
+
+    await application.populate({
+      path: "job",
+      select:
+        "title company location jobType workMode experienceLevel salary status applicationDeadline",
+    });
+
+    return application;
+  }
+
 
   /*
 |--------------------------------------------------------------------------
@@ -297,6 +543,53 @@ async updateApplicationStatus(
     throw new ApiError(
       403,
       "You are not authorized to update this application"
+    );
+  }
+
+  /*
+|--------------------------------------------------------------------------
+| Validate Application Status
+|--------------------------------------------------------------------------
+*/
+
+const allowedStatuses = [
+  "applied",
+  "shortlisted",
+  "rejected",
+  "hired",
+];
+
+if (!allowedStatuses.includes(status)) {
+  throw new ApiError(
+    400,
+    "Invalid application status"
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Validate Status Transition
+|--------------------------------------------------------------------------
+*/
+
+  const allowedTransitions = {
+    applied: ["shortlisted", "rejected", "withdrawn"],
+    shortlisted: ["hired", "rejected", "withdrawn"],
+    rejected: [],
+    hired: [],
+    withdrawn: [],
+  };
+  const currentStatus =
+    application.status;
+
+  if (
+    !allowedTransitions[currentStatus].includes(
+      status
+    )
+  ) {
+    throw new ApiError(
+      400,
+      `Application cannot be changed from ${currentStatus} to ${status}`
     );
   }
 
@@ -351,11 +644,6 @@ async updateApplicationStatus(
         `Congratulations! Your application for ${job.title} has been hired.`;
       break;
 
-    case "applied":
-      notificationMessage =
-        `Your application for ${job.title} is now marked as applied.`;
-      break;
-
     default:
       notificationMessage =
         `Your application for ${job.title} has been updated.`;
@@ -372,13 +660,32 @@ async updateApplicationStatus(
   return application;
 }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Get Student Dashboard
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| Get Student Dashboard
+|--------------------------------------------------------------------------
+*/
 
-    async getStudentDashboard(studentId) {
+  async getStudentDashboard(studentId) {
+
+  /*
+  |--------------------------------------------------------------------------
+  | Validate Student ID
+  |--------------------------------------------------------------------------
+  */
+
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      throw new ApiError(
+        400,
+        "Invalid student ID"
+      );
+    }
+
+    /*
+  |--------------------------------------------------------------------------
+  | Application Statistics
+  |--------------------------------------------------------------------------
+  */
       const total =
         await Application.countDocuments({
           student: studentId,
@@ -408,31 +715,114 @@ async updateApplicationStatus(
           status: "hired",
         });
 
-      const recentApplications =
-        await Application.find({
+      const withdrawn =
+        await Application.countDocuments({
           student: studentId,
-        })
-          .populate(
-            "job",
-            "title company location jobType workMode experienceLevel salary status applicationDeadline"
-          )
-          .sort({
-            createdAt: -1,
-          })
-          .limit(5);
+          status: "withdrawn",
+        });
 
-      return {
-        statistics: {
-          total,
-          applied,
-          shortlisted,
-          rejected,
-          hired,
-        },
+      /*
+|--------------------------------------------------------------------------
+| Status Summary
+|--------------------------------------------------------------------------
+*/
 
-        recentApplications,
-      };
-    }
+    const statusSummary = [
+      {
+        status: "applied",
+        count: applied,
+      },
+      {
+        status: "shortlisted",
+        count: shortlisted,
+      },
+      {
+        status: "rejected",
+        count: rejected,
+      },
+      {
+        status: "hired",
+        count: hired,
+      },
+      {
+        status: "withdrawn",
+        count: withdrawn,
+      },
+    ];
+
+ /*
+|--------------------------------------------------------------------------
+| Recent Applications
+|--------------------------------------------------------------------------
+*/
+
+  const recentApplications =
+    await Application.find({
+      student: studentId,
+    })
+      .select(
+        "job status createdAt updatedAt"
+      )
+      .populate(
+        "job",
+        "title company location jobType workMode experienceLevel salary status applicationDeadline"
+      )
+      .sort({
+        createdAt: -1,
+      })
+      .limit(5);
+
+      /*
+|--------------------------------------------------------------------------
+| Application Summary
+|--------------------------------------------------------------------------
+*/
+
+  const activeApplications =
+    applied + shortlisted;
+
+  const completedApplications =
+    rejected + hired;
+
+  const successfulApplications =
+  shortlisted + hired;
+
+  const successRate =
+    total > 0
+      ? Number(
+          (
+            (successfulApplications / total) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
+/*
+|--------------------------------------------------------------------------
+| Return Dashboard
+|--------------------------------------------------------------------------
+*/
+
+    return {
+      statistics: {
+        total,
+        applied,
+        shortlisted,
+        rejected,
+        hired,
+        withdrawn,
+      },
+
+      summary: {
+        activeApplications,
+        completedApplications,
+        successRate,
+      },
+
+      statusSummary,
+      recentApplications,
+    };
+  }
 
 /*
 |--------------------------------------------------------------------------
@@ -442,6 +832,18 @@ async updateApplicationStatus(
 
   async getRecruiterDashboard(recruiterId) {
 
+
+  /*
+  |--------------------------------------------------------------------------
+  | Validate Recruiter ID
+  |--------------------------------------------------------------------------
+  */
+    if (!mongoose.Types.ObjectId.isValid(recruiterId)) {
+      throw new ApiError(
+        400,
+        "Invalid recruiter ID"
+      );
+    }
 /*
 |--------------------------------------------------------------------------
 | Find recruiter's jobs
@@ -511,6 +913,68 @@ async updateApplicationStatus(
       status: "hired",
     });
 
+  const rejectedApplications =
+  await Application.countDocuments({
+    job: {
+      $in: jobIds,
+    },
+    status: "rejected",
+  });
+
+  const withdrawnApplications =
+  await Application.countDocuments({
+    job: {
+      $in: jobIds,
+    },
+    status: "withdrawn",
+  });
+
+  /*
+|--------------------------------------------------------------------------
+| Application Status Summary
+|--------------------------------------------------------------------------
+*/
+
+const applicationStatusSummary = [
+  {
+    status: "applied",
+    count: pendingApplications,
+  },
+  {
+    status: "shortlisted",
+    count: shortlistedApplications,
+  },
+  {
+    status: "rejected",
+    count: rejectedApplications,
+  },
+  {
+    status: "hired",
+    count: hiredCandidates,
+  },
+  {
+    status: "withdrawn",
+    count: withdrawnApplications,
+  },
+];
+
+  /*
+  |--------------------------------------------------------------------------
+  | Hiring Rate
+  |--------------------------------------------------------------------------
+  */
+
+  const hiringRate =
+    totalApplications > 0
+      ? Number(
+          (
+            (hiredCandidates /
+              totalApplications) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
   /*
   |--------------------------------------------------------------------------
   | Recent Applications
@@ -536,28 +1000,127 @@ async updateApplicationStatus(
       })
       .limit(5);
 
+      /*
+|--------------------------------------------------------------------------
+| Candidate Summary
+|--------------------------------------------------------------------------
+*/
+
+const candidateSummary =
+  recentApplications.map(
+    (application) => ({
+      applicationId: application._id,
+      candidate: application.student
+        ? {
+            id: application.student._id,
+            name: application.student.name,
+            email: application.student.email,
+            avatar: application.student.avatar,
+          }
+        : null,
+
+      job: application.job
+        ? {
+            id: application.job._id,
+            title: application.job.title,
+            company: application.job.company,
+          }
+        : null,
+
+      status: application.status,
+      appliedAt: application.createdAt,
+    })
+  );
+
 /*
 |--------------------------------------------------------------------------
 | Recent Jobs With Application Count
 |--------------------------------------------------------------------------
 */
 
-    const recentJobs = await Promise.all(
-      jobs.slice(0, 5).map(
-        async (job) => {
-          const applicationCount =
-            await Application.countDocuments({
-              job: job._id,
-            });
+const recentJobs = await Promise.all(
+  jobs.slice(0, 5).map(
+    async (job) => {
+      const applicationCount =
+        await Application.countDocuments({
+          job: job._id,
+        });
 
-          return {
-            ...job.toObject(),
-            applicationCount,
-          };
-        }
-      )
-    );
+      return {
+        ...job.toObject(),
+        applicationCount,
+      };
+    }
+  )
+);
 
+/*
+|--------------------------------------------------------------------------
+| Job Performance Summary
+|--------------------------------------------------------------------------
+*/
+
+const jobPerformance =
+  await Promise.all(
+    jobs.map(async (job) => {
+
+      const applicationCount =
+        await Application.countDocuments({
+          job: job._id,
+        });
+
+      const shortlistedCount =
+        await Application.countDocuments({
+          job: job._id,
+          status: "shortlisted",
+        });
+
+      const hiredCount =
+        await Application.countDocuments({
+          job: job._id,
+          status: "hired",
+        });
+
+      const rejectedCount =
+        await Application.countDocuments({
+          job: job._id,
+          status: "rejected",
+        });
+
+      const withdrawnCount =
+        await Application.countDocuments({
+          job: job._id,
+          status: "withdrawn",
+        });
+
+      return {
+        jobId: job._id,
+        title: job.title,
+        company: job.company,
+        status: job.status,
+        applicationCount,
+        shortlistedCount,
+        hiredCount,
+        rejectedCount,
+        withdrawnCount,
+      };
+    })
+  );
+
+/*
+|--------------------------------------------------------------------------
+| Sort Jobs By Application Count
+|--------------------------------------------------------------------------
+*/
+
+  jobPerformance.sort(
+    (a, b) =>
+      b.applicationCount -
+      a.applicationCount
+  );
+
+  const topJobPerformance =
+  jobPerformance.slice(0, 5);
   /*
   |--------------------------------------------------------------------------
   | Return Dashboard
@@ -571,12 +1134,21 @@ async updateApplicationStatus(
         totalApplications,
         pendingApplications,
         shortlistedApplications,
+        rejectedApplications,
         hiredCandidates,
+        withdrawnApplications,
+        hiringRate,
       },
+
+      applicationStatusSummary,
 
       recentApplications,
 
+      candidateSummary,
+
       recentJobs,
+
+      jobPerformance: topJobPerformance,
     };
   }
 
@@ -586,9 +1158,14 @@ async updateApplicationStatus(
 |--------------------------------------------------------------------------
 */
 
-async getAllApplications(filters = {}) {
+async getAllApplications(
+  filters = {}
+) {
   const {
     status,
+    sort = "latest",
+    page = 1,
+    limit = 10,
   } = filters;
 
   /*
@@ -611,6 +1188,47 @@ async getAllApplications(filters = {}) {
 
   /*
   |--------------------------------------------------------------------------
+  | Pagination
+  |--------------------------------------------------------------------------
+  */
+
+  const currentPage =
+    Math.max(Number(page) || 1, 1);
+
+  const itemsPerPage =
+    Math.min(
+      Math.max(Number(limit) || 10, 1),
+      100
+    );
+
+  const skip =
+    (currentPage - 1) *
+    itemsPerPage;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Sort
+  |--------------------------------------------------------------------------
+  */
+
+  const sortOption =
+    sort === "oldest"
+      ? { createdAt: 1 }
+      : { createdAt: -1 };
+
+  /*
+  |--------------------------------------------------------------------------
+  | Total Count
+  |--------------------------------------------------------------------------
+  */
+
+  const totalApplications =
+    await Application.countDocuments(
+      query
+    );
+
+  /*
+  |--------------------------------------------------------------------------
   | Fetch Applications
   |--------------------------------------------------------------------------
   */
@@ -625,11 +1243,38 @@ async getAllApplications(filters = {}) {
         "job",
         "title company location jobType workMode experienceLevel salary status applicationDeadline recruiter"
       )
-      .sort({
-        createdAt: -1,
-      });
+      .sort(sortOption)
+      .skip(skip)
+      .limit(itemsPerPage);
 
-  return applications;
+  /*
+  |--------------------------------------------------------------------------
+  | Pagination Metadata
+  |--------------------------------------------------------------------------
+  */
+
+  const totalPages =
+    Math.ceil(
+      totalApplications /
+        itemsPerPage
+    );
+
+  return {
+    applications,
+
+    pagination: {
+      currentPage,
+      itemsPerPage,
+      totalApplications,
+      totalPages,
+
+      hasNextPage:
+        currentPage < totalPages,
+
+      hasPreviousPage:
+        currentPage > 1,
+    },
+  };
 }
 /*
 |--------------------------------------------------------------------------

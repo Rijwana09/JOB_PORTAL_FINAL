@@ -101,6 +101,15 @@ router.get(
 | Student - Application Details
 |--------------------------------------------------------------------------
 */
+router.patch(
+  "/:applicationId/withdraw",
+  authMiddleware,
+  authorizeRoles("student"),
+  applicationIdValidator,
+  validate,
+  applicationController.withdrawApplication
+);
+
 router.get(
   "/:applicationId",
   authMiddleware,

@@ -22,6 +22,7 @@ const applicationSchema =
           "shortlisted",
           "rejected",
           "hired",
+          "withdrawn",
         ],
         default: "applied",
       },

@@ -12,4 +12,17 @@ router.get(
   notificationController.getMyNotifications
 );
 
+router.patch(
+  "/read-all",
+  authMiddleware,
+  notificationController
+    .markAllNotificationsAsRead
+);
+
+router.patch(
+  "/:notificationId/read",
+  authMiddleware,
+  notificationController.markNotificationAsRead
+);
+
 export default router;

@@ -4,6 +4,50 @@ import ApiError from "../utils/ApiError.js";
 
 import applicationService from "../services/application.service.js";
 
+const allowedApplicationStatuses = [
+  "applied",
+  "shortlisted",
+  "rejected",
+  "hired",
+  "withdrawn",
+];
+
+const allowedSortOptions = [
+  "latest",
+  "oldest",
+];
+
+const validatePagination = (
+  page,
+  limit
+) => {
+  const currentPage =
+    Number(page);
+
+  const itemsPerPage =
+    Number(limit);
+
+  if (
+    !Number.isInteger(currentPage) ||
+    currentPage < 1
+  ) {
+    throw new ApiError(
+      400,
+      "Page must be a positive integer"
+    );
+  }
+
+  if (
+    !Number.isInteger(itemsPerPage) ||
+    itemsPerPage < 1 ||
+    itemsPerPage > 100
+  ) {
+    throw new ApiError(
+      400,
+      "Limit must be between 1 and 100"
+    );
+  }
+};
 
 class ApplicationController {
 
@@ -41,11 +85,92 @@ class ApplicationController {
   */
 
   getMyApplications = asyncHandler(
+  async (req, res) => {
+    const {
+      status,
+      sort = "latest",
+    } = req.query;
+
+    if (
+      status &&
+      !allowedApplicationStatuses.includes(
+        status
+      )
+    ) {
+      throw new ApiError(
+        400,
+        "Invalid application status"
+      );
+    }
+
+    if (
+      !allowedSortOptions.includes(sort)
+    ) {
+      throw new ApiError(
+        400,
+        "Invalid sort option"
+      );
+    }
+
+    const applications =
+      await applicationService.getMyApplications(
+        req.user.id,
+        req.query
+      );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse({
+          statusCode: 200,
+          data: applications,
+          message:
+            "Applications fetched successfully",
+        })
+      );
+  }
+);
+  /*
+|--------------------------------------------------------------------------
+| Get Recruiter's Applications
+|--------------------------------------------------------------------------
+*/
+
+  getRecruiterApplications =
+  asyncHandler(
     async (req, res) => {
-      const applications =
-        await applicationService.getMyApplications(
-          req.user.id
+      const {
+        status,
+        sort = "latest",
+      } = req.query;
+
+      if (
+        status &&
+        !allowedApplicationStatuses.includes(
+          status
+        )
+      ) {
+        throw new ApiError(
+          400,
+          "Invalid application status"
         );
+      }
+
+      if (
+        !allowedSortOptions.includes(sort)
+      ) {
+        throw new ApiError(
+          400,
+          "Invalid sort option"
+        );
+      }
+
+      const applications =
+        await applicationService
+          .getRecruiterApplications(
+            req.user.id,
+            req.query
+          );
 
       return res
         .status(200)
@@ -54,40 +179,11 @@ class ApplicationController {
             statusCode: 200,
             data: applications,
             message:
-              "Applications fetched successfully",
+              "Recruiter's applications fetched successfully",
           })
         );
     }
   );
-
-  /*
-|--------------------------------------------------------------------------
-| Get Recruiter's Applications
-|--------------------------------------------------------------------------
-*/
-
-  getRecruiterApplications =
-    asyncHandler(
-      async (req, res) => {
-        const applications =
-          await applicationService
-            .getRecruiterApplications(
-              req.user.id,
-              req.query
-            );
-
-        return res
-          .status(200)
-          .json(
-            new ApiResponse({
-              statusCode: 200,
-              data: applications,
-              message:
-                "Recruiter's applications fetched successfully",
-            })
-          );
-      }
-    );
 
     getRecruiterApplicationById = asyncHandler(
       async (req, res) => {
@@ -116,15 +212,29 @@ class ApplicationController {
 |--------------------------------------------------------------------------
 */
 
-updateApplicationStatus = asyncHandler(
+  updateApplicationStatus = asyncHandler(
     async (req, res) => {
       const { applicationId } = req.params;
       const { status } = req.body;
+
+      const allowedStatuses = [
+        "applied",
+        "shortlisted",
+        "rejected",
+        "hired",
+      ];
 
       if (!status) {
         throw new ApiError(
           400,
           "Application status is required"
+        );
+      }
+
+      if (!allowedStatuses.includes(status)) {
+        throw new ApiError(
+          400,
+          "Invalid application status"
         );
       }
 
@@ -175,6 +285,33 @@ updateApplicationStatus = asyncHandler(
           );
       }
     );
+
+    /*
+|--------------------------------------------------------------------------
+| Withdraw Student Application
+|--------------------------------------------------------------------------
+*/
+
+withdrawApplication = asyncHandler(
+  async (req, res) => {
+    const application =
+      await applicationService.withdrawApplication(
+        req.params.applicationId,
+        req.user.id
+      );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse({
+          statusCode: 200,
+          data: application,
+          message:
+            "Application withdrawn successfully",
+        })
+      );
+  }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -243,6 +380,12 @@ getAllApplications = asyncHandler(
       "shortlisted",
       "rejected",
       "hired",
+      "withdrawn",
+    ];
+    
+    const allowedSortOptions = [
+      "latest",
+      "oldest",
     ];
 
     if (
@@ -254,6 +397,14 @@ getAllApplications = asyncHandler(
         "Invalid application status"
       );
     }
+
+    if (!allowedSortOptions.includes(sort)
+      ) {
+        throw new ApiError(
+          400,
+          "Invalid sort option"
+        );
+      }
 
     const applications =
       await applicationService.getAllApplications(
