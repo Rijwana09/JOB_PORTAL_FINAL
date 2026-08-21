@@ -20,6 +20,16 @@ import {
   getJobById,
 } from "../../api/jobApi";
 
+import {
+  applyForJob,
+} from "../../api/applicationApi";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import ROUTES from "../../constants/routes";
+
 import toast from "react-hot-toast";
 
 const JobDetails = () => {
@@ -28,11 +38,106 @@ const JobDetails = () => {
   const navigate =
     useNavigate();
 
+  const {
+    user,
+    isAuthenticated,
+    loading: authLoading,
+  } = useAuth();
+
   const [job, setJob] =
     useState(null);
 
   const [loading, setLoading] =
     useState(true);
+
+  const [applying, setApplying] =
+    useState(false);
+
+  const [isApplied, setIsApplied] =
+    useState(false);
+
+
+  const handleApply = async () => {
+  /*
+  |--------------------------------------------------------------------------
+  | Authentication Check
+  |--------------------------------------------------------------------------
+  */
+
+  if (!isAuthenticated) {
+    toast.error(
+      "Please login to apply for this job"
+    );
+
+    navigate(ROUTES.LOGIN);
+
+    return;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Role Check
+  |--------------------------------------------------------------------------
+  */
+
+  if (user?.role !== "student") {
+    toast.error(
+      "Only students can apply for jobs"
+    );
+
+    return;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Prevent Duplicate Click
+  |--------------------------------------------------------------------------
+  */
+
+  if (applying || isApplied) {
+    return;
+  }
+
+  try {
+    setApplying(true);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apply For Job
+    |--------------------------------------------------------------------------
+    */
+
+    await applyForJob(id);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update UI
+    |--------------------------------------------------------------------------
+    */
+
+    setIsApplied(true);
+
+    toast.success(
+      "Application submitted successfully"
+    );
+
+  } catch (error) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Handle Backend Error
+    |--------------------------------------------------------------------------
+    */
+
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to apply for this job"
+    );
+
+  } finally {
+    setApplying(false);
+  }
+};
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -181,11 +286,31 @@ const JobDetails = () => {
               Interested?
             </h2>
 
-            <button
-              className="mt-5 w-full rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
-            >
-              Apply Now
-            </button>
+            {user?.role === "student" || !isAuthenticated ? (
+          <button
+            onClick={handleApply}
+            disabled={
+              applying ||
+              isApplied ||
+              authLoading
+            }
+            className={`mt-5 w-full rounded-lg px-5 py-3 font-medium text-white transition ${
+              isApplied
+                ? "cursor-not-allowed bg-green-600"
+                : applying || authLoading
+                ? "cursor-not-allowed bg-gray-400"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {isApplied
+              ? "✓ Applied"
+              : applying
+              ? "Applying..."
+              : authLoading
+              ? "Checking..."
+              : "Apply Now"}
+          </button>
+        ) : null}
 
           </aside>
 

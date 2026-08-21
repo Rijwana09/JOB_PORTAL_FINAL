@@ -35,6 +35,10 @@ import EditJob from "./pages/Recruiter/EditJob";
 
 import StudentDashboard from "./pages/student/StudentDashboard";
 
+import MyApplications from "./pages/Student/MyApplications";
+
+import ApplicationDetails from "./pages/Student/ApplicationDetails";
+
 
 
 function App() {
@@ -81,14 +85,26 @@ function App() {
         <Route element={<ProtectedRoute />}>
 
           {/* Student */}
-          <Route element={
-            <RoleRoute
-              allowedRoles={[ROLES.STUDENT]}
-            />
-          }>
+          <Route
+            element={
+              <RoleRoute
+                allowedRoles={[ROLES.STUDENT]}
+              />
+            }
+          >
             <Route
               path="/student/dashboard"
               element={<StudentDashboard />}
+            />
+
+            <Route
+              path="/student/applications"
+              element={<MyApplications />}
+            />
+
+            <Route
+              path="/student/applications/:applicationId"
+              element={<ApplicationDetails />}
             />
           </Route>
 

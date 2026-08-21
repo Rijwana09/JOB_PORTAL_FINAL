@@ -28,7 +28,6 @@ export const getMyApplications =
       await api.get(
         "/applications/my-applications"
       );
-
     return response.data;
   };
 
