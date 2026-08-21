@@ -49,6 +49,12 @@ class JobService {
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| Get All Jobs
+|--------------------------------------------------------------------------
+*/
+
 async getAllJobs(filters = {}) {
   const {
     search,
@@ -87,9 +93,12 @@ async getAllJobs(filters = {}) {
   |--------------------------------------------------------------------------
   */
 
-  if (search) {
+  if (
+    search &&
+    search.trim()
+  ) {
     query.$text = {
-      $search: search,
+      $search: search.trim(),
     };
   }
 
@@ -99,9 +108,12 @@ async getAllJobs(filters = {}) {
   |--------------------------------------------------------------------------
   */
 
-  if (location) {
+  if (
+    location &&
+    location.trim()
+  ) {
     query.location = {
-      $regex: location,
+      $regex: location.trim(),
       $options: "i",
     };
   }
@@ -148,42 +160,109 @@ async getAllJobs(filters = {}) {
       ? skills
       : skills.split(",");
 
-    query.skills = {
-      $in: skillArray.map((skill) =>
-        new RegExp(
-          `^${skill.trim()}$`,
-          "i"
+    const cleanedSkills =
+      skillArray
+        .map((skill) =>
+          skill.trim()
         )
-      ),
-    };
+        .filter(Boolean);
+
+    if (cleanedSkills.length > 0) {
+      query.skills = {
+        $in: cleanedSkills.map(
+          (skill) =>
+            new RegExp(
+              `^${skill.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+              )}$`,
+              "i"
+            )
+        ),
+      };
+    }
   }
 
   /*
-|--------------------------------------------------------------------------
-| Salary Filter
-|--------------------------------------------------------------------------
-*/
+  |--------------------------------------------------------------------------
+  | Salary Filter
+  |--------------------------------------------------------------------------
+  */
 
-if (
-  minSalary !== undefined ||
-  maxSalary !== undefined
-) {
-  const salaryFilter = {};
+  const hasMinSalary =
+    minSalary !== undefined &&
+    minSalary !== "";
 
-    if (minSalary !== undefined) {
-      salaryFilter["salary.max"] = {
-        $gte: Number(minSalary),
-      };
+  const hasMaxSalary =
+    maxSalary !== undefined &&
+    maxSalary !== "";
+
+  let parsedMinSalary;
+  let parsedMaxSalary;
+
+  if (hasMinSalary) {
+    parsedMinSalary =
+      Number(minSalary);
+
+    if (
+      !Number.isFinite(
+        parsedMinSalary
+      ) ||
+      parsedMinSalary < 0
+    ) {
+      throw new ApiError(
+        400,
+        "Minimum salary must be a valid non-negative number"
+      );
     }
+  }
 
-    if (maxSalary !== undefined) {
-      salaryFilter["salary.min"] = {
-        $lte: Number(maxSalary),
-      };
+  if (hasMaxSalary) {
+    parsedMaxSalary =
+      Number(maxSalary);
+
+    if (
+      !Number.isFinite(
+        parsedMaxSalary
+      ) ||
+      parsedMaxSalary < 0
+    ) {
+      throw new ApiError(
+        400,
+        "Maximum salary must be a valid non-negative number"
+      );
     }
+  }
 
-    Object.assign(query, salaryFilter);
-}
+  if (
+    hasMinSalary &&
+    hasMaxSalary &&
+    parsedMinSalary >
+      parsedMaxSalary
+  ) {
+    throw new ApiError(
+      400,
+      "Minimum salary cannot be greater than maximum salary"
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Salary Range Overlap
+  |--------------------------------------------------------------------------
+  */
+
+  if (hasMinSalary) {
+    query["salary.max"] = {
+      $gte: parsedMinSalary,
+    };
+  }
+
+  if (hasMaxSalary) {
+    query["salary.min"] = {
+      $lte: parsedMaxSalary,
+    };
+  }
 
   /*
   |--------------------------------------------------------------------------
@@ -197,9 +276,82 @@ if (
   );
 
   const itemsPerPage = Math.min(
-    Math.max(Number(limit) || 10, 1),
+    Math.max(
+      Number(limit) || 10,
+      1
+    ),
     100
   );
+
+  /*
+|--------------------------------------------------------------------------
+| Sorting
+|--------------------------------------------------------------------------
+*/
+
+const allowedSortFields = [
+  "createdAt",
+  "updatedAt",
+  "title",
+  "company",
+  "salary.min",
+  "salary.max",
+  "relevance",
+];
+
+const allowedSortOrders = [
+  "asc",
+  "desc",
+];
+
+const safeSortBy =
+  allowedSortFields.includes(
+    sortBy
+  )
+    ? sortBy
+    : "createdAt";
+
+const safeSortOrder =
+  allowedSortOrders.includes(
+    sortOrder
+  )
+    ? sortOrder
+    : "desc";
+
+const sortDirection =
+  safeSortOrder === "asc"
+    ? 1
+    : -1;
+
+let sort = {};
+
+if (
+  search &&
+  search.trim() &&
+  safeSortBy === "createdAt"
+) {
+  sort = {
+    score: {
+      $meta: "textScore",
+    },
+    createdAt: -1,
+    _id: -1,
+  };
+} else {
+  sort = {
+    [safeSortBy]:
+      sortDirection,
+
+    _id:
+      sortDirection,
+  };
+}
+
+  /*
+  |--------------------------------------------------------------------------
+  | Pagination Skip
+  |--------------------------------------------------------------------------
+  */
 
   const skip =
     (currentPage - 1) *
@@ -207,48 +359,25 @@ if (
 
   /*
   |--------------------------------------------------------------------------
-  | Sorting
-  |--------------------------------------------------------------------------
-  */
-
-  const allowedSortFields = [
-    "createdAt",
-    "updatedAt",
-    "title",
-    "company",
-  ];
-
-  const safeSortBy =
-    allowedSortFields.includes(sortBy)
-      ? sortBy
-      : "createdAt";
-
-  const safeSortOrder =
-    sortOrder === "asc" ? 1 : -1;
-
-  const sort = {
-    [safeSortBy]: safeSortOrder,
-  };
-
-  /*
-  |--------------------------------------------------------------------------
   | Fetch Jobs
   |--------------------------------------------------------------------------
   */
 
-  const [jobs, totalJobs] =
-    await Promise.all([
-      Job.find(query)
-        .populate(
-          "recruiter",
-          "name email avatar"
-        )
-        .sort(sort)
-        .skip(skip)
-        .limit(itemsPerPage),
+  const [
+    jobs,
+    totalJobs,
+  ] = await Promise.all([
+    Job.find(query)
+      .populate(
+        "recruiter",
+        "name email avatar"
+      )
+      .sort(sort)
+      .skip(skip)
+      .limit(itemsPerPage),
 
-      Job.countDocuments(query),
-    ]);
+    Job.countDocuments(query),
+  ]);
 
   /*
   |--------------------------------------------------------------------------
@@ -256,9 +385,11 @@ if (
   |--------------------------------------------------------------------------
   */
 
-  const totalPages = Math.ceil(
-    totalJobs / itemsPerPage
-  );
+  const totalPages =
+    Math.ceil(
+      totalJobs /
+        itemsPerPage
+    );
 
   return {
     jobs,
@@ -270,7 +401,8 @@ if (
       totalPages,
 
       hasNextPage:
-        currentPage < totalPages,
+        currentPage <
+        totalPages,
 
       hasPreviousPage:
         currentPage > 1,
@@ -278,7 +410,7 @@ if (
   };
 }
 
-  /*
+/*
 |--------------------------------------------------------------------------
 | Get Single Job
 |--------------------------------------------------------------------------

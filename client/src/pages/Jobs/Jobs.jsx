@@ -44,6 +44,15 @@ const Jobs = () => {
   const [page, setPage] =
     useState(1);
 
+  const [skills, setSkills] =
+  useState("");
+
+  const [sortBy, setSortBy] =
+    useState("createdAt");
+
+  const [sortOrder, setSortOrder] =
+    useState("desc");
+
   const [pagination, setPagination] =
     useState({
       currentPage: 1,
@@ -52,6 +61,14 @@ const Jobs = () => {
       hasNextPage: false,
       hasPreviousPage: false,
     });
+
+  const [minSalary, setMinSalary] =
+    useState("");
+
+  const [maxSalary, setMaxSalary] =
+    useState("");
+
+
 
   /*
   |--------------------------------------------------------------------------
@@ -74,9 +91,24 @@ const Jobs = () => {
 
         experienceLevel:experienceLevel || undefined,
 
+        skills: skills || undefined,
+
+        minSalary:
+          minSalary !== ""
+            ? minSalary
+            : undefined,
+
+        maxSalary:
+          maxSalary !== ""
+            ? maxSalary
+            : undefined,
+
+        sortBy,
+          sortOrder,
+
         page,
         limit: 10,
-      });
+        });
 
       setJobs(
         response.data.jobs
@@ -96,6 +128,7 @@ const Jobs = () => {
     }
   };
 
+
   /*
   |--------------------------------------------------------------------------
   | Load Jobs
@@ -111,6 +144,11 @@ const Jobs = () => {
     jobType,
     workMode,
     experienceLevel,
+    skills,
+    minSalary,
+    maxSalary,
+    sortBy,
+    sortOrder,
   ]);
 
   /*
@@ -127,22 +165,6 @@ const Jobs = () => {
     setSubmittedSearch(search.trim());
   };
 
-  // /*
-  // |--------------------------------------------------------------------------
-  // | Filter Change
-  // |--------------------------------------------------------------------------
-  // */
-
-  // const handleFilterChange = (
-  //   setter
-  // ) => {
-  //   setter(
-  //     event.target.value
-  //   );
-
-  //   setPage(1);
-  // };
-
   const clearFilters = () => {
     setSearch("");
     setSubmittedSearch("");
@@ -150,6 +172,11 @@ const Jobs = () => {
     setJobType("");
     setWorkMode("");
     setExperienceLevel("");
+    setSkills("");
+    setMinSalary("");
+    setMaxSalary("");
+    setSortBy("createdAt");
+    setSortOrder("desc");
     setPage(1);
   };
 
@@ -344,6 +371,69 @@ const Jobs = () => {
               </select>
             </div>
 
+            {/* Skills */}
+
+          <div className="mt-5">
+            <label className="text-sm font-medium">
+              Skills
+            </label>
+
+            <input
+              type="text"
+              placeholder="e.g. React, Node.js"
+              value={skills}
+              onChange={(e) => {
+                setSkills(e.target.value);
+                setPage(1);
+              }}
+              className="mt-2 w-full rounded-lg border px-3 py-2 outline-none focus:border-blue-500"
+            />
+
+            <p className="mt-1 text-xs text-gray-400">
+              Separate multiple skills with commas
+            </p>
+          </div>
+
+            {/* Salary Range */}
+
+            <div className="mt-5">
+              <label className="text-sm font-medium">
+                Salary Range
+              </label>
+
+              <div className="mt-2 grid grid-cols-2 gap-2">
+
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Min"
+                  value={minSalary}
+                  onChange={(e) => {
+                    setMinSalary(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full rounded-lg border px-3 py-2 outline-none focus:border-blue-500"
+                />
+
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Max"
+                  value={maxSalary}
+                  onChange={(e) => {
+                    setMaxSalary(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full rounded-lg border px-3 py-2 outline-none focus:border-blue-500"
+                />
+
+              </div>
+
+              <p className="mt-1 text-xs text-gray-400">
+                Enter annual salary in INR
+              </p>
+            </div>
+
             <button
                 type="button"
                 onClick={clearFilters}
@@ -357,13 +447,57 @@ const Jobs = () => {
           {/* Jobs */}
           <main>
 
-            <div className="mb-5 flex items-center justify-between">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-              <p className="text-sm text-gray-500">
-                {pagination.totalJobs} jobs found
-              </p>
+                <p className="text-sm text-gray-500">
+                  {pagination.totalJobs} jobs found
+                </p>
 
-            </div>
+                <div className="flex items-center gap-2">
+
+                  <label
+                    htmlFor="sort"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Sort by:
+                  </label>
+
+                  <select
+                    id="sort"
+                    value={`${sortBy}-${sortOrder}`}
+                    onChange={(e) =>
+                      handleSortChange(e.target.value)
+                    }
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  >
+                    <option value="createdAt-desc">
+                      Newest
+                    </option>
+
+                    <option value="createdAt-asc">
+                      Oldest
+                    </option>
+
+                    <option value="title-asc">
+                      Job Title A-Z
+                    </option>
+
+                    <option value="title-desc">
+                      Job Title Z-A
+                    </option>
+
+                    <option value="company-asc">
+                      Company A-Z
+                    </option>
+
+                    <option value="company-desc">
+                      Company Z-A
+                    </option>
+                  </select>
+
+                </div>
+
+              </div>
 
             {loading ? (
               <div className="py-20 text-center">
@@ -396,45 +530,59 @@ const Jobs = () => {
             )}
 
             {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-4">
 
-                <button
-                  disabled={
-                    !pagination.hasPreviousPage
-                  }
-                  onClick={() =>
-                    setPage(
-                      (prev) => prev - 1
-                    )
-                  }
-                  className="rounded-lg border p-2 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <FiChevronLeft />
-                </button>
+              {pagination.totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-4">
 
-                <span className="text-sm">
-                  Page {pagination.currentPage}{" "}
-                  of{" "}
-                  {pagination.totalPages}
-                </span>
+                  <button
+                    type="button"
+                    disabled={
+                      !pagination.hasPreviousPage
+                    }
+                    onClick={() => {
+                      if (pagination.hasPreviousPage) {
+                        setPage(
+                          pagination.currentPage - 1
+                        );
+                      }
+                    }}
+                    className="rounded-lg border p-2 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Previous page"
+                  >
+                    <FiChevronLeft />
+                  </button>
 
-                <button
-                  disabled={
-                    !pagination.hasNextPage
-                  }
-                  onClick={() =>
-                    setPage(
-                      (prev) => prev + 1
-                    )
-                  }
-                  className="rounded-lg border p-2 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <FiChevronRight />
-                </button>
+                  <span className="text-sm text-gray-600">
+                    Page{" "}
+                    <span className="font-medium text-gray-900">
+                      {pagination.currentPage}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium text-gray-900">
+                      {pagination.totalPages}
+                    </span>
+                  </span>
 
-              </div>
-            )}
+                  <button
+                    type="button"
+                    disabled={
+                      !pagination.hasNextPage
+                    }
+                    onClick={() => {
+                      if (pagination.hasNextPage) {
+                        setPage(
+                          pagination.currentPage + 1
+                        );
+                      }
+                    }}
+                    className="rounded-lg border p-2 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Next page"
+                  >
+                    <FiChevronRight />
+                  </button>
+
+                </div>
+              )}
 
           </main>
 
