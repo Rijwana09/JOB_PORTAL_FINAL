@@ -144,46 +144,50 @@ class UserService {
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Student Profile Fields
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| Education
+|--------------------------------------------------------------------------
+*/
 
-    if (user.role === "student") {
-      /*
-      |--------------------------------------------------------------------------
-      | Education
-      |--------------------------------------------------------------------------
-      */
+if (education !== undefined) {
+  const trimmedEducation =
+    String(education).trim();
 
-      if (education !== undefined) {
-        updateData.education =
-          String(education).trim();
-      }
+  if (trimmedEducation.length > 200) {
+    throw new ApiError(
+      400,
+      "Education cannot exceed 200 characters"
+    );
+  }
 
-      /*
-      |--------------------------------------------------------------------------
-      | Skills
-      |--------------------------------------------------------------------------
-      */
+  updateData.education =
+    trimmedEducation;
+}
 
-      if (skills !== undefined) {
-        if (!Array.isArray(skills)) {
-          throw new ApiError(
-            400,
-            "Skills must be an array"
-          );
-        }
 
-        updateData.skills =
-          skills
-            .map((skill) =>
-              String(skill).trim()
-            )
-            .filter(Boolean)
-            .slice(0, 30);
-      }
-    }
+/*
+|--------------------------------------------------------------------------
+| Skills
+|--------------------------------------------------------------------------
+*/
+
+if (skills !== undefined) {
+
+  if (!Array.isArray(skills)) {
+    throw new ApiError(
+      400,
+      "Skills must be an array"
+    );
+  }
+
+  updateData.skills =
+    skills
+      .map((skill) =>
+        String(skill).trim()
+      )
+      .filter(Boolean)
+      .slice(0, 30);
+}
 
     /*
     |--------------------------------------------------------------------------

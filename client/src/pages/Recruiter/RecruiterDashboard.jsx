@@ -9,10 +9,11 @@ import {
   FiEdit,
   FiTrash2,
   FiEye,
-  FiUsers,
   FiCheckCircle,
   FiFileText,
   FiRefreshCw,
+  FiMapPin,
+  FiClock,
 } from "react-icons/fi";
 
 import {
@@ -34,7 +35,8 @@ import {
 
 const RecruiterDashboard = () => {
 
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] =
+    useState([]);
 
   const [loading, setLoading] =
     useState(true);
@@ -67,9 +69,11 @@ const RecruiterDashboard = () => {
         response?.data?.jobs || [];
 
       if (!Array.isArray(jobList)) {
+
         throw new Error(
           "Invalid jobs response"
         );
+
       }
 
       setJobs(jobList);
@@ -91,6 +95,7 @@ const RecruiterDashboard = () => {
       setLoading(false);
 
     }
+
   };
 
 
@@ -113,7 +118,9 @@ const RecruiterDashboard = () => {
   |--------------------------------------------------------------------------
   */
 
-  const handleDelete = async (jobId) => {
+  const handleDelete = async (
+    jobId
+  ) => {
 
     const confirmed =
       window.confirm(
@@ -153,6 +160,7 @@ const RecruiterDashboard = () => {
       setDeletingId(null);
 
     }
+
   };
 
 
@@ -171,22 +179,26 @@ const RecruiterDashboard = () => {
 
       setUpdatingStatusId(jobId);
 
-      await updateJob(jobId, {
-        status: newStatus,
-      });
+      await updateJob(
+        jobId,
+        {
+          status: newStatus,
+        }
+      );
 
       toast.success(
         "Job status updated successfully"
       );
 
       setJobs((prevJobs) =>
-        prevJobs.map((job) =>
-          job._id === jobId
-            ? {
-                ...job,
-                status: newStatus,
-              }
-            : job
+        prevJobs.map(
+          (job) =>
+            job._id === jobId
+              ? {
+                  ...job,
+                  status: newStatus,
+                }
+              : job
         )
       );
 
@@ -202,6 +214,7 @@ const RecruiterDashboard = () => {
       setUpdatingStatusId(null);
 
     }
+
   };
 
 
@@ -211,7 +224,8 @@ const RecruiterDashboard = () => {
   |--------------------------------------------------------------------------
   */
 
-  const totalJobs = jobs.length;
+  const totalJobs =
+    jobs.length;
 
   const publishedJobs =
     jobs.filter(
@@ -238,7 +252,9 @@ const RecruiterDashboard = () => {
   |--------------------------------------------------------------------------
   */
 
-  const getStatusStyle = (status) => {
+  const getStatusStyle = (
+    status
+  ) => {
 
     switch (status) {
 
@@ -253,7 +269,9 @@ const RecruiterDashboard = () => {
 
       default:
         return "bg-gray-100 text-gray-600";
+
     }
+
   };
 
 
@@ -266,23 +284,41 @@ const RecruiterDashboard = () => {
   if (loading) {
 
     return (
+
       <div className="min-h-screen bg-gray-50">
 
-        <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
           <div className="animate-pulse">
 
-            <div className="h-8 w-64 rounded bg-gray-200" />
+            {/* Header Skeleton */}
 
-            <div className="mt-3 h-4 w-80 rounded bg-gray-200" />
+            <div className="h-8 w-56 rounded bg-gray-200 sm:w-64" />
 
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-3 h-4 w-full max-w-md rounded bg-gray-200" />
+
+
+            {/* Button Skeleton */}
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+
+              <div className="h-11 w-full rounded-lg bg-gray-200 sm:w-28" />
+
+              <div className="h-11 w-full rounded-lg bg-gray-200 sm:w-36" />
+
+            </div>
+
+
+            {/* Stats Skeleton */}
+
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
 
               {[1, 2, 3, 4].map(
                 (item) => (
+
                   <div
                     key={item}
-                    className="rounded-xl bg-white p-6 shadow-sm"
+                    className="rounded-xl bg-white p-5 shadow-sm sm:p-6"
                   >
 
                     <div className="h-10 w-10 rounded-lg bg-gray-200" />
@@ -292,12 +328,16 @@ const RecruiterDashboard = () => {
                     <div className="mt-2 h-8 w-16 rounded bg-gray-200" />
 
                   </div>
+
                 )
               )}
 
             </div>
 
-            <div className="mt-8 rounded-xl bg-white p-6 shadow-sm">
+
+            {/* Jobs Skeleton */}
+
+            <div className="mt-8 rounded-xl bg-white p-5 shadow-sm sm:p-6">
 
               <div className="h-6 w-32 rounded bg-gray-200" />
 
@@ -305,10 +345,12 @@ const RecruiterDashboard = () => {
 
                 {[1, 2, 3].map(
                   (item) => (
+
                     <div
                       key={item}
-                      className="h-16 rounded bg-gray-100"
+                      className="h-32 rounded-lg bg-gray-100"
                     />
+
                   )
                 )}
 
@@ -321,7 +363,9 @@ const RecruiterDashboard = () => {
         </div>
 
       </div>
+
     );
+
   }
 
 
@@ -335,11 +379,12 @@ const RecruiterDashboard = () => {
 
     <div className="min-h-screen bg-gray-50">
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-        {/* --------------------------------------------------------------
-            Header
-        -------------------------------------------------------------- */}
+
+        {/* ================================================================
+            HEADER
+        ================================================================= */}
 
         <motion.div
           initial={{
@@ -353,43 +398,53 @@ const RecruiterDashboard = () => {
           transition={{
             duration: 0.4,
           }}
-          className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center"
+          className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"
         >
+
+          {/* Title */}
 
           <div>
 
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
               Recruiter Dashboard
             </h1>
 
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500 sm:text-base">
               Manage your job postings and hiring opportunities.
             </p>
 
           </div>
 
 
-          <div className="flex gap-3">
+          {/* Actions */}
+
+          <div className="grid grid-cols-2 gap-3 sm:flex">
 
             <button
               type="button"
               onClick={fetchMyJobs}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] sm:px-4"
             >
+
               <FiRefreshCw />
 
-              Refresh
+              <span>
+                Refresh
+              </span>
+
             </button>
 
 
             <Link
               to="/recruiter/jobs/create"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-3 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-[0.98] sm:px-5"
             >
 
               <FiPlus />
 
-              Post a Job
+              <span>
+                Post a Job
+              </span>
 
             </Link>
 
@@ -398,11 +453,12 @@ const RecruiterDashboard = () => {
         </motion.div>
 
 
-        {/* --------------------------------------------------------------
-            Statistics
-        -------------------------------------------------------------- */}
+        {/* ================================================================
+            STATISTICS
+        ================================================================= */}
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+
 
           {/* Total */}
 
@@ -418,10 +474,10 @@ const RecruiterDashboard = () => {
             transition={{
               delay: 0.1,
             }}
-            className="rounded-xl bg-white p-6 shadow-sm"
+            className="rounded-xl bg-white p-5 shadow-sm sm:p-6"
           >
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
 
               <div>
 
@@ -429,13 +485,13 @@ const RecruiterDashboard = () => {
                   Total Jobs
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-gray-900">
+                <p className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
                   {totalJobs}
                 </p>
 
               </div>
 
-              <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+              <div className="shrink-0 rounded-xl bg-blue-50 p-3 text-blue-600">
 
                 <FiBriefcase className="text-xl" />
 
@@ -460,10 +516,10 @@ const RecruiterDashboard = () => {
             transition={{
               delay: 0.15,
             }}
-            className="rounded-xl bg-white p-6 shadow-sm"
+            className="rounded-xl bg-white p-5 shadow-sm sm:p-6"
           >
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
 
               <div>
 
@@ -471,13 +527,13 @@ const RecruiterDashboard = () => {
                   Published
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-green-600">
+                <p className="mt-2 text-2xl font-bold text-green-600 sm:text-3xl">
                   {publishedJobs}
                 </p>
 
               </div>
 
-              <div className="rounded-xl bg-green-50 p-3 text-green-600">
+              <div className="shrink-0 rounded-xl bg-green-50 p-3 text-green-600">
 
                 <FiCheckCircle className="text-xl" />
 
@@ -502,10 +558,10 @@ const RecruiterDashboard = () => {
             transition={{
               delay: 0.2,
             }}
-            className="rounded-xl bg-white p-6 shadow-sm"
+            className="rounded-xl bg-white p-5 shadow-sm sm:p-6"
           >
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
 
               <div>
 
@@ -513,13 +569,13 @@ const RecruiterDashboard = () => {
                   Drafts
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-yellow-600">
+                <p className="mt-2 text-2xl font-bold text-yellow-600 sm:text-3xl">
                   {draftJobs}
                 </p>
 
               </div>
 
-              <div className="rounded-xl bg-yellow-50 p-3 text-yellow-600">
+              <div className="shrink-0 rounded-xl bg-yellow-50 p-3 text-yellow-600">
 
                 <FiFileText className="text-xl" />
 
@@ -544,10 +600,10 @@ const RecruiterDashboard = () => {
             transition={{
               delay: 0.25,
             }}
-            className="rounded-xl bg-white p-6 shadow-sm"
+            className="rounded-xl bg-white p-5 shadow-sm sm:p-6"
           >
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
 
               <div>
 
@@ -555,13 +611,13 @@ const RecruiterDashboard = () => {
                   Closed
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-gray-600">
+                <p className="mt-2 text-2xl font-bold text-gray-600 sm:text-3xl">
                   {closedJobs}
                 </p>
 
               </div>
 
-              <div className="rounded-xl bg-gray-100 p-3 text-gray-600">
+              <div className="shrink-0 rounded-xl bg-gray-100 p-3 text-gray-600">
 
                 <FiBriefcase className="text-xl" />
 
@@ -574,9 +630,9 @@ const RecruiterDashboard = () => {
         </div>
 
 
-        {/* --------------------------------------------------------------
-            Jobs Section
-        -------------------------------------------------------------- */}
+        {/* ================================================================
+            JOBS SECTION
+        ================================================================= */}
 
         <motion.div
           initial={{
@@ -590,16 +646,17 @@ const RecruiterDashboard = () => {
           transition={{
             delay: 0.3,
           }}
-          className="mt-8 overflow-hidden rounded-xl bg-white shadow-sm"
+          className="mt-7 overflow-hidden rounded-xl bg-white shadow-sm sm:mt-8"
         >
+
 
           {/* Section Header */}
 
-          <div className="flex flex-col justify-between gap-4 border-b px-6 py-5 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 border-b px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
 
             <div>
 
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
                 My Jobs
               </h2>
 
@@ -612,7 +669,7 @@ const RecruiterDashboard = () => {
 
             <Link
               to="/recruiter/jobs/create"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-600 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50 sm:w-auto"
             >
 
               <FiPlus />
@@ -624,11 +681,13 @@ const RecruiterDashboard = () => {
           </div>
 
 
-          {/* Empty State */}
+          {/* ============================================================
+              EMPTY STATE
+          ============================================================= */}
 
           {jobs.length === 0 ? (
 
-            <div className="px-6 py-16 text-center">
+            <div className="px-5 py-14 text-center sm:px-6 sm:py-16">
 
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
 
@@ -640,7 +699,7 @@ const RecruiterDashboard = () => {
                 No jobs posted yet
               </h3>
 
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
                 Create your first job posting and start finding the right candidates.
               </p>
 
@@ -659,220 +718,415 @@ const RecruiterDashboard = () => {
 
           ) : (
 
-            /* ----------------------------------------------------------
-               Desktop / Tablet Table
-            ---------------------------------------------------------- */
+            <>
+              {/* ========================================================
+                  MOBILE JOB CARDS
+              ========================================================= */}
 
-            <div className="overflow-x-auto">
+              <div className="divide-y md:hidden">
 
-              <table className="w-full min-w-[850px]">
+                {jobs.map(
+                  (job, index) => (
 
-                <thead>
+                    <motion.div
+                      key={job._id}
+                      initial={{
+                        opacity: 0,
+                        y: 10,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        delay:
+                          0.05 * index,
+                      }}
+                      className="p-5"
+                    >
 
-                  <tr className="border-b bg-gray-50 text-left text-sm text-gray-500">
+                      {/* Job Header */}
 
-                    <th className="px-6 py-4 font-medium">
-                      Job
-                    </th>
+                      <div className="flex items-start justify-between gap-3">
 
-                    <th className="px-6 py-4 font-medium">
-                      Type
-                    </th>
+                        <div className="min-w-0 flex-1">
 
-                    <th className="px-6 py-4 font-medium">
-                      Work Mode
-                    </th>
+                          <p className="truncate font-semibold text-gray-900">
+                            {job.title}
+                          </p>
 
-                    <th className="px-6 py-4 font-medium">
-                      Status
-                    </th>
+                          <p className="mt-1 truncate text-sm text-gray-500">
+                            {job.company}
+                          </p>
 
-                    <th className="px-6 py-4 text-right font-medium">
-                      Actions
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {jobs.map(
-                    (job, index) => (
-
-                      <motion.tr
-                        key={job._id}
-                        initial={{
-                          opacity: 0,
-                        }}
-                        animate={{
-                          opacity: 1,
-                        }}
-                        transition={{
-                          delay:
-                            0.05 * index,
-                        }}
-                        className="border-b last:border-b-0 hover:bg-gray-50"
-                      >
-
-                        {/* Job */}
-
-                        <td className="px-6 py-5">
-
-                          <div>
-
-                            <p className="font-semibold text-gray-900">
-                              {job.title}
-                            </p>
-
-                            <p className="mt-1 text-sm text-gray-500">
-                              {job.company}
-                            </p>
-
-                            <p className="mt-1 text-xs text-gray-400">
-                              {job.location}
-                            </p>
-
-                          </div>
-
-                        </td>
-
-
-                        {/* Type */}
-
-                        <td className="px-6 py-5">
-
-                          <span className="text-sm text-gray-600">
-                            {job.jobType}
-                          </span>
-
-                        </td>
-
-
-                        {/* Work Mode */}
-
-                        <td className="px-6 py-5">
-
-                          <span className="text-sm text-gray-600">
-                            {job.workMode}
-                          </span>
-
-                        </td>
+                        </div>
 
 
                         {/* Status */}
 
-                        <td className="px-6 py-5">
+                        <select
+                          value={job.status}
+                          disabled={
+                            updatingStatusId ===
+                            job._id
+                          }
+                          onChange={(e) =>
+                            handleStatusChange(
+                              job._id,
+                              e.target.value
+                            )
+                          }
+                          className={`shrink-0 rounded-full border-0 px-2.5 py-1.5 text-xs font-semibold outline-none ${getStatusStyle(
+                            job.status
+                          )}`}
+                        >
 
-                          <select
-                            value={job.status}
-                            disabled={
-                              updatingStatusId ===
+                          <option value="draft">
+                            Draft
+                          </option>
+
+                          <option value="published">
+                            Published
+                          </option>
+
+                          <option value="closed">
+                            Closed
+                          </option>
+
+                        </select>
+
+                      </div>
+
+
+                      {/* Job Meta */}
+
+                      <div className="mt-4 grid grid-cols-1 gap-2 text-sm text-gray-500">
+
+                        <div className="flex items-center gap-2">
+
+                          <FiMapPin className="shrink-0" />
+
+                          <span className="truncate">
+                            {job.location ||
+                              "Location not specified"}
+                          </span>
+
+                        </div>
+
+
+                        <div className="flex items-center gap-2">
+
+                          <FiBriefcase className="shrink-0" />
+
+                          <span className="capitalize">
+                            {job.jobType ||
+                              "Not specified"}
+                          </span>
+
+                        </div>
+
+
+                        <div className="flex items-center gap-2">
+
+                          <FiClock className="shrink-0" />
+
+                          <span className="capitalize">
+                            {job.workMode ||
+                              "Not specified"}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* Actions */}
+
+                      <div className="mt-5 grid grid-cols-3 gap-2">
+
+                        {/* View */}
+
+                        <Link
+                          to={`/jobs/${job._id}`}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+                        >
+
+                          <FiEye />
+
+                          View
+
+                        </Link>
+
+
+                        {/* Edit */}
+
+                        <Link
+                          to={`/recruiter/jobs/${job._id}/edit`}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs font-medium text-blue-600 transition hover:bg-blue-100"
+                        >
+
+                          <FiEdit />
+
+                          Edit
+
+                        </Link>
+
+
+                        {/* Delete */}
+
+                        <button
+                          type="button"
+                          disabled={
+                            deletingId ===
+                            job._id
+                          }
+                          onClick={() =>
+                            handleDelete(
                               job._id
-                            }
-                            onChange={(e) =>
-                              handleStatusChange(
-                                job._id,
-                                e.target.value
-                              )
-                            }
-                            className={`rounded-full border-0 px-3 py-1.5 text-xs font-semibold outline-none ${getStatusStyle(
-                              job.status
-                            )}`}
-                          >
+                            )
+                          }
+                          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-100 bg-red-50 px-3 py-2.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
 
-                            <option value="draft">
-                              Draft
-                            </option>
+                          {deletingId ===
+                          job._id ? (
+                            "..."
+                          ) : (
+                            <>
+                              <FiTrash2 />
 
-                            <option value="published">
-                              Published
-                            </option>
+                              Delete
+                            </>
+                          )}
 
-                            <option value="closed">
-                              Closed
-                            </option>
+                        </button>
 
-                          </select>
+                      </div>
 
-                        </td>
+                    </motion.div>
 
+                  )
+                )}
 
-                        {/* Actions */}
-
-                        <td className="px-6 py-5">
-
-                          <div className="flex justify-end gap-1">
-
-                            {/* View */}
-
-                            <Link
-                              to={`/jobs/${job._id}`}
-                              className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
-                              title="View Job"
-                            >
-
-                              <FiEye />
-
-                            </Link>
+              </div>
 
 
-                            {/* Edit */}
+              {/* ========================================================
+                  DESKTOP / TABLET TABLE
+              ========================================================= */}
 
-                            <Link
-                              to={`/recruiter/jobs/${job._id}/edit`}
-                              className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
-                              title="Edit Job"
-                            >
+              <div className="hidden overflow-x-auto md:block">
 
-                              <FiEdit />
+                <table className="w-full min-w-[850px]">
 
-                            </Link>
+                  <thead>
+
+                    <tr className="border-b bg-gray-50 text-left text-sm text-gray-500">
+
+                      <th className="px-6 py-4 font-medium">
+                        Job
+                      </th>
+
+                      <th className="px-6 py-4 font-medium">
+                        Type
+                      </th>
+
+                      <th className="px-6 py-4 font-medium">
+                        Work Mode
+                      </th>
+
+                      <th className="px-6 py-4 font-medium">
+                        Status
+                      </th>
+
+                      <th className="px-6 py-4 text-right font-medium">
+                        Actions
+                      </th>
+
+                    </tr>
+
+                  </thead>
 
 
-                            {/* Delete */}
+                  <tbody>
 
-                            <button
-                              type="button"
+                    {jobs.map(
+                      (job, index) => (
+
+                        <motion.tr
+                          key={job._id}
+                          initial={{
+                            opacity: 0,
+                          }}
+                          animate={{
+                            opacity: 1,
+                          }}
+                          transition={{
+                            delay:
+                              0.05 * index,
+                          }}
+                          className="border-b last:border-b-0 hover:bg-gray-50"
+                        >
+
+                          {/* Job */}
+
+                          <td className="px-6 py-5">
+
+                            <div>
+
+                              <p className="font-semibold text-gray-900">
+                                {job.title}
+                              </p>
+
+                              <p className="mt-1 text-sm text-gray-500">
+                                {job.company}
+                              </p>
+
+                              <p className="mt-1 text-xs text-gray-400">
+                                {job.location}
+                              </p>
+
+                            </div>
+
+                          </td>
+
+
+                          {/* Type */}
+
+                          <td className="px-6 py-5">
+
+                            <span className="text-sm capitalize text-gray-600">
+                              {job.jobType}
+                            </span>
+
+                          </td>
+
+
+                          {/* Work Mode */}
+
+                          <td className="px-6 py-5">
+
+                            <span className="text-sm capitalize text-gray-600">
+                              {job.workMode}
+                            </span>
+
+                          </td>
+
+
+                          {/* Status */}
+
+                          <td className="px-6 py-5">
+
+                            <select
+                              value={job.status}
                               disabled={
-                                deletingId ===
+                                updatingStatusId ===
                                 job._id
                               }
-                              onClick={() =>
-                                handleDelete(
-                                  job._id
+                              onChange={(e) =>
+                                handleStatusChange(
+                                  job._id,
+                                  e.target.value
                                 )
                               }
-                              className="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                              title="Delete Job"
+                              className={`rounded-full border-0 px-3 py-1.5 text-xs font-semibold outline-none ${getStatusStyle(
+                                job.status
+                              )}`}
                             >
 
-                              {deletingId ===
-                              job._id ? (
-                                <span className="text-xs">
-                                  ...
-                                </span>
-                              ) : (
-                                <FiTrash2 />
-                              )}
+                              <option value="draft">
+                                Draft
+                              </option>
 
-                            </button>
+                              <option value="published">
+                                Published
+                              </option>
 
-                          </div>
+                              <option value="closed">
+                                Closed
+                              </option>
 
-                        </td>
+                            </select>
 
-                      </motion.tr>
+                          </td>
 
-                    )
-                  )}
 
-                </tbody>
+                          {/* Actions */}
 
-              </table>
+                          <td className="px-6 py-5">
 
-            </div>
+                            <div className="flex justify-end gap-1">
+
+                              {/* View */}
+
+                              <Link
+                                to={`/jobs/${job._id}`}
+                                className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+                                title="View Job"
+                              >
+
+                                <FiEye />
+
+                              </Link>
+
+
+                              {/* Edit */}
+
+                              <Link
+                                to={`/recruiter/jobs/${job._id}/edit`}
+                                className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
+                                title="Edit Job"
+                              >
+
+                                <FiEdit />
+
+                              </Link>
+
+
+                              {/* Delete */}
+
+                              <button
+                                type="button"
+                                disabled={
+                                  deletingId ===
+                                  job._id
+                                }
+                                onClick={() =>
+                                  handleDelete(
+                                    job._id
+                                  )
+                                }
+                                className="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                title="Delete Job"
+                              >
+
+                                {deletingId ===
+                                job._id ? (
+                                  <span className="text-xs">
+                                    ...
+                                  </span>
+                                ) : (
+                                  <FiTrash2 />
+                                )}
+
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </motion.tr>
+
+                      )
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </>
 
           )}
 
@@ -881,7 +1135,9 @@ const RecruiterDashboard = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 

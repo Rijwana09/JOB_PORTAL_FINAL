@@ -31,9 +31,11 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="bg-slate-900 py-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="bg-slate-900 py-14 sm:py-20">
 
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* Section Heading */}
         <motion.div
           initial={{
             opacity: 0,
@@ -49,21 +51,22 @@ export default function Stats() {
           viewport={{
             once: true,
           }}
-          className="mb-12 text-center"
+          className="mb-8 text-center sm:mb-12"
         >
 
-          <h2 className="text-3xl font-bold text-white md:text-4xl">
+          <h2 className="text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
             Growing With Opportunities
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-slate-400">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:mt-4 sm:text-base">
             Our platform brings students, recruiters and opportunities
             together in one place.
           </p>
 
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
 
           {stats.map((stat, index) => {
             const Icon = stat.icon;
@@ -86,16 +89,16 @@ export default function Stats() {
                 viewport={{
                   once: true,
                 }}
-                className="rounded-2xl border border-slate-700 bg-slate-800 p-6 text-center"
+                className="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center sm:rounded-2xl sm:p-6"
               >
 
-                <Icon className="mx-auto mb-4 text-2xl text-blue-400" />
+                <Icon className="mx-auto mb-3 text-xl text-blue-400 sm:mb-4 sm:text-2xl" />
 
-                <h3 className="text-3xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-white sm:text-3xl">
                   {stat.value}
                 </h3>
 
-                <p className="mt-2 text-sm text-slate-400">
+                <p className="mt-1 text-xs text-slate-400 sm:mt-2 sm:text-sm">
                   {stat.label}
                 </p>
 

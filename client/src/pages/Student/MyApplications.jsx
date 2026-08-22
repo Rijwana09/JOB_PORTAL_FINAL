@@ -764,7 +764,7 @@ const MyApplications = () => {
 
         <div className="mb-6 rounded-xl bg-white p-4 shadow-sm sm:p-5">
 
-          <div className="grid gap-4 md:grid-cols-[1fr_auto_auto]">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-[1fr_auto_auto]">
 
 
             {/* Search */}
@@ -796,7 +796,7 @@ const MyApplications = () => {
             <select
               value={statusFilter}
               onChange={handleStatusChange}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
 
               <option value="">
@@ -831,7 +831,7 @@ const MyApplications = () => {
             <select
               value={sort}
               onChange={handleSortChange}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
 
               <option value="latest">
@@ -994,7 +994,7 @@ const MyApplications = () => {
                     key={
                       application._id
                     }
-                    className="rounded-xl bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-6"
+                    className="rounded-xl bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-6"
                   >
 
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -1017,7 +1017,7 @@ const MyApplications = () => {
 
                           <div className="min-w-0">
 
-                            <h2 className="truncate text-lg font-bold text-gray-900">
+                            <h2 className="break-words text-lg font-bold text-gray-900 sm:truncate">
 
                               {job?.title ||
                                 "Job Title"}

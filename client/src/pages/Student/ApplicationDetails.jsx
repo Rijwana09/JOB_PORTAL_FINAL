@@ -12,7 +12,6 @@ import {
   FiArrowLeft,
   FiBriefcase,
   FiCalendar,
-  FiCheckCircle,
   FiClock,
   FiDollarSign,
   FiMapPin,
@@ -27,6 +26,10 @@ import {
 } from "../../api/applicationApi";
 
 import api from "../../api/axios";
+
+import ApplicationStatus from "../../components/Application/ApplicationStatus";
+
+import ApplicationTimeline from "../../components/Application/ApplicationTimeline";
 
 
 const ApplicationDetails = () => {
@@ -83,27 +86,14 @@ const ApplicationDetails = () => {
           );
 
         console.log(
-          "Application Details API Response:",
+          "Student Application Details:",
           response
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Backend ApiResponse
-        |--------------------------------------------------------------------------
-        |
-        | response
-        |   └── data
-        |       └── application
-        |
-        */
-
         if (!response?.data) {
-
           throw new Error(
             "Application data not found"
           );
-
         }
 
         setApplication(
@@ -186,12 +176,6 @@ const ApplicationDetails = () => {
             "Application withdrawn successfully"
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Refresh Application
-        |--------------------------------------------------------------------------
-        */
-
         await fetchApplication();
 
       } catch (error) {
@@ -217,202 +201,7 @@ const ApplicationDetails = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | Loading State
-  |--------------------------------------------------------------------------
-  */
-
-  if (loading) {
-
-    return (
-      <div className="min-h-screen bg-gray-50">
-
-        <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-4">
-
-          <div className="flex items-center gap-3 text-gray-500">
-
-            <FiRefreshCw
-              className="animate-spin text-lg"
-            />
-
-            <span>
-              Loading application...
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-    );
-
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Error State
-  |--------------------------------------------------------------------------
-  */
-
-  if (error) {
-
-    return (
-      <div className="min-h-screen bg-gray-50">
-
-        <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-4">
-
-          <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
-
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
-
-              <FiXCircle className="text-2xl text-red-600" />
-
-            </div>
-
-            <h2 className="mt-5 text-xl font-semibold text-gray-900">
-              Unable to Load Application
-            </h2>
-
-            <p className="mt-2 text-sm leading-6 text-gray-500">
-              {error}
-            </p>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-
-              <button
-                onClick={fetchApplication}
-                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
-              >
-
-                <FiRefreshCw />
-
-                Retry
-
-              </button>
-
-              <button
-                onClick={() =>
-                  navigate(
-                    "/student/applications"
-                  )
-                }
-                className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
-              >
-
-                <FiArrowLeft />
-
-                Back to Applications
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    );
-
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Application Not Found
-  |--------------------------------------------------------------------------
-  */
-
-  if (!application) {
-
-    return (
-      <div className="min-h-screen bg-gray-50">
-
-        <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-4">
-
-          <div className="text-center">
-
-            <h2 className="text-xl font-semibold text-gray-800">
-              Application not found
-            </h2>
-
-            <button
-              onClick={() =>
-                navigate(
-                  "/student/applications"
-                )
-              }
-              className="mt-4 rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-700"
-            >
-              Back to Applications
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    );
-
-  }
-
-
-  const job =
-    application.job;
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Status Helpers
-  |--------------------------------------------------------------------------
-  */
-
-  const getStatusClass =
-    (status) => {
-
-      switch (status) {
-
-        case "applied":
-          return "bg-blue-100 text-blue-700";
-
-        case "shortlisted":
-          return "bg-yellow-100 text-yellow-700";
-
-        case "rejected":
-          return "bg-red-100 text-red-700";
-
-        case "hired":
-          return "bg-green-100 text-green-700";
-
-        case "withdrawn":
-          return "bg-gray-100 text-gray-700";
-
-        default:
-          return "bg-gray-100 text-gray-700";
-
-      }
-
-    };
-
-
-  const formatStatus =
-    (status) => {
-
-      if (!status) {
-        return "Unknown";
-      }
-
-      return status
-        .charAt(0)
-        .toUpperCase() +
-        status.slice(1);
-
-    };
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Date Formatter
+  | Format Date
   |--------------------------------------------------------------------------
   */
 
@@ -448,7 +237,7 @@ const ApplicationDetails = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | Date + Time Formatter
+  | Format Date Time
   |--------------------------------------------------------------------------
   */
 
@@ -486,7 +275,7 @@ const ApplicationDetails = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | Salary Formatter
+  | Format Salary
   |--------------------------------------------------------------------------
   */
 
@@ -508,25 +297,19 @@ const ApplicationDetails = () => {
         salary.min !== undefined &&
         salary.max !== undefined
       ) {
-
         return `₹${salary.min} - ₹${salary.max}`;
-
       }
 
       if (
         salary.min !== undefined
       ) {
-
         return `₹${salary.min}+`;
-
       }
 
       if (
         salary.max !== undefined
       ) {
-
         return `Up to ₹${salary.max}`;
-
       }
 
       return "Not specified";
@@ -536,84 +319,131 @@ const ApplicationDetails = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | Application Status Timeline
+  | Loading
   |--------------------------------------------------------------------------
-  |
-  | IMPORTANT:
-  | The backend does not store status history.
-  |
-  | Therefore this is NOT historical data.
-  | It represents the current application progression
-  | based on the current status.
-  |
   */
 
-  const timelineStatuses = [
-    "applied",
-    "shortlisted",
-    "hired",
-  ];
+  if (loading) {
 
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
 
-  const getTimelineState =
-    (status) => {
+        <div className="flex items-center gap-3 text-gray-500">
 
-      if (
-        status === "rejected"
-      ) {
-        return {
-          applied: "completed",
-          shortlisted: "inactive",
-          hired: "inactive",
-        };
-      }
+          <FiRefreshCw className="animate-spin" />
 
-      if (
-        status === "withdrawn"
-      ) {
-        return {
-          applied: "completed",
-          shortlisted: "inactive",
-          hired: "inactive",
-        };
-      }
+          <span>
+            Loading application...
+          </span>
 
-      const currentIndex =
-        timelineStatuses.indexOf(
-          status
-        );
+        </div>
 
-      return {
-        applied:
-          currentIndex >= 0
-            ? "completed"
-            : "inactive",
-
-        shortlisted:
-          currentIndex >= 1
-            ? "completed"
-            : "inactive",
-
-        hired:
-          currentIndex >= 2
-            ? "completed"
-            : "inactive",
-      };
-
-    };
-
-
-  const timelineState =
-    getTimelineState(
-      application.status
+      </div>
     );
+
+  }
 
 
   /*
   |--------------------------------------------------------------------------
-  | Can Withdraw
+  | Error
   |--------------------------------------------------------------------------
   */
+
+  if (error) {
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
+
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+
+            <FiXCircle className="text-2xl text-red-600" />
+
+          </div>
+
+          <h2 className="mt-5 text-xl font-semibold text-gray-900">
+            Unable to Load Application
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-gray-500">
+            {error}
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+
+            <button
+              onClick={
+                fetchApplication
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
+            >
+
+              <FiRefreshCw />
+
+              Retry
+
+            </button>
+
+            <button
+              onClick={() =>
+                navigate(
+                  "/student/applications"
+                )
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+            >
+
+              <FiArrowLeft />
+
+              Back
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  if (!application) {
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+
+        <div className="text-center">
+
+          <h2 className="text-xl font-semibold text-gray-800">
+            Application not found
+          </h2>
+
+          <button
+            onClick={() =>
+              navigate(
+                "/student/applications"
+              )
+            }
+            className="mt-4 rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white"
+          >
+            Back to Applications
+          </button>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  const job =
+    application.job;
+
 
   const canWithdraw =
     application.status !==
@@ -624,21 +454,14 @@ const ApplicationDetails = () => {
       "hired";
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | UI
-  |--------------------------------------------------------------------------
-  */
-
   return (
 
     <div className="min-h-screen bg-gray-50">
 
-      <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
 
-        {/* ------------------------------------------------
-            Back Button
-        ------------------------------------------------ */}
+
+        {/* Back */}
 
         <button
           onClick={() =>
@@ -646,7 +469,7 @@ const ApplicationDetails = () => {
               "/student/applications"
             )
           }
-          className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-blue-600"
+          className="mb-6 inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-blue-600"
         >
 
           <FiArrowLeft />
@@ -656,13 +479,11 @@ const ApplicationDetails = () => {
         </button>
 
 
-        {/* ------------------------------------------------
-            Application Header
-        ------------------------------------------------ */}
+        {/* Header */}
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
 
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
 
             <div>
 
@@ -671,73 +492,67 @@ const ApplicationDetails = () => {
               </p>
 
               <h1 className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
-                {job?.title || "Job Title"}
+                {job?.title ||
+                  "Job Title"}
               </h1>
 
               <p className="mt-2 text-lg text-gray-500">
-                {job?.company || "Company"}
+                {job?.company ||
+                  "Company"}
               </p>
 
             </div>
 
-
-            <span
-              className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${getStatusClass(
+            <ApplicationStatus
+              status={
                 application.status
-              )}`}
-            >
-
-              {formatStatus(
-                application.status
-              )}
-
-            </span>
+              }
+            />
 
           </div>
 
 
-          {/* ------------------------------------------------
-              Job Information
-          ------------------------------------------------ */}
+          <div className="mt-6 grid gap-3 border-t pt-6 sm:grid-cols-2 lg:grid-cols-3">
 
-          <div className="mt-6 grid gap-4 border-t pt-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-            <div className="flex items-center gap-3 text-gray-600">
-
-              <FiMapPin className="shrink-0 text-blue-600" />
+              <FiMapPin className="text-blue-600" />
 
               <span>
-                {job?.location || "N/A"}
+                {job?.location ||
+                  "N/A"}
               </span>
 
             </div>
 
 
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-              <FiBriefcase className="shrink-0 text-blue-600" />
+              <FiBriefcase className="text-blue-600" />
 
               <span>
-                {job?.jobType || "N/A"}
+                {job?.jobType ||
+                  "N/A"}
               </span>
 
             </div>
 
 
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-              <FiClock className="shrink-0 text-blue-600" />
+              <FiClock className="text-blue-600" />
 
               <span>
-                {job?.workMode || "N/A"}
+                {job?.workMode ||
+                  "N/A"}
               </span>
 
             </div>
 
 
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-              <FiDollarSign className="shrink-0 text-blue-600" />
+              <FiDollarSign className="text-blue-600" />
 
               <span>
                 {formatSalary(
@@ -748,9 +563,9 @@ const ApplicationDetails = () => {
             </div>
 
 
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-              <FiCalendar className="shrink-0 text-blue-600" />
+              <FiCalendar className="text-blue-600" />
 
               <span>
                 Applied on{" "}
@@ -762,9 +577,9 @@ const ApplicationDetails = () => {
             </div>
 
 
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 text-gray-600">
 
-              <FiCalendar className="shrink-0 text-blue-600" />
+              <FiCalendar className="text-blue-600" />
 
               <span>
                 Updated on{" "}
@@ -780,60 +595,51 @@ const ApplicationDetails = () => {
         </div>
 
 
-        {/* ------------------------------------------------
-            Application Information
-        ------------------------------------------------ */}
+        {/* Application Information */}
 
-        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-7">
 
           <h2 className="text-xl font-semibold text-gray-900">
             Application Information
           </h2>
 
+          <div className="mt-5 divide-y">
 
-          <div className="mt-5 space-y-4">
+            <div className="flex flex-col gap-2 py-4 first:pt-0 sm:flex-row sm:items-center sm:justify-between">
 
-            <div className="flex flex-col gap-1 border-b pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-
-              <span className="text-gray-500">
+              <span className="text-sm text-gray-500">
                 Application ID
               </span>
 
-              <span className="break-all font-medium text-gray-800 sm:text-right">
+              <span className="break-all text-sm font-medium text-gray-800 sm:text-right">
                 {application._id}
               </span>
 
             </div>
 
 
-            <div className="flex flex-col gap-1 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
 
-              <span className="text-gray-500">
+              <span className="text-sm text-gray-500">
                 Current Status
               </span>
 
-              <span
-                className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${getStatusClass(
+              <ApplicationStatus
+                status={
                   application.status
-                )}`}
-              >
-
-                {formatStatus(
-                  application.status
-                )}
-
-              </span>
+                }
+              />
 
             </div>
 
 
-            <div className="flex flex-col gap-1 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
 
-              <span className="text-gray-500">
+              <span className="text-sm text-gray-500">
                 Application Date
               </span>
 
-              <span className="font-medium text-gray-800">
+              <span className="text-sm font-medium text-gray-800 sm:text-right">
                 {formatDateTime(
                   application.createdAt
                 )}
@@ -842,13 +648,13 @@ const ApplicationDetails = () => {
             </div>
 
 
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 py-4 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
 
-              <span className="text-gray-500">
+              <span className="text-sm text-gray-500">
                 Last Updated
               </span>
 
-              <span className="font-medium text-gray-800">
+              <span className="text-sm font-medium text-gray-800 sm:text-right">
                 {formatDateTime(
                   application.updatedAt
                 )}
@@ -861,158 +667,32 @@ const ApplicationDetails = () => {
         </div>
 
 
-        {/* ------------------------------------------------
-            Status Progress
-        ------------------------------------------------ */}
+        {/* Timeline */}
 
-        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-6">
 
-          <div>
-
-            <h2 className="text-xl font-semibold text-gray-900">
-              Application Progress
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Current application status
-            </p>
-
-          </div>
-
-
-          <div className="mt-6 space-y-5">
-
-            {timelineStatuses.map(
-              (status, index) => {
-
-                const state =
-                  timelineState[
-                    status
-                  ];
-
-                const isCurrent =
-                  application.status ===
-                  status;
-
-                return (
-
-                  <div
-                    key={status}
-                    className="flex items-start gap-4"
-                  >
-
-                    <div className="flex flex-col items-center">
-
-                      <div
-                        className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                          state === "completed"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-400"
-                        }`}
-                      >
-
-                        {state ===
-                        "completed" ? (
-                          <FiCheckCircle />
-                        ) : (
-                          <span className="h-2.5 w-2.5 rounded-full bg-current" />
-                        )}
-
-                      </div>
-
-                      {index <
-                        timelineStatuses.length -
-                          1 && (
-                        <div className="mt-1 h-7 w-px bg-gray-200" />
-                      )}
-
-                    </div>
-
-
-                    <div className="pt-1">
-
-                      <p
-                        className={`font-semibold ${
-                          isCurrent
-                            ? "text-blue-600"
-                            : state ===
-                                "completed"
-                              ? "text-gray-800"
-                              : "text-gray-400"
-                        }`}
-                      >
-                        {formatStatus(
-                          status
-                        )}
-
-                        {isCurrent &&
-                          " • Current"}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                );
-
-              }
-            )}
-
-
-            {/* ------------------------------------------------
-                Rejected / Withdrawn
-            ------------------------------------------------ */}
-
-            {(application.status ===
-              "rejected" ||
-              application.status ===
-                "withdrawn") && (
-
-              <div className="flex items-start gap-4">
-
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-600">
-
-                  <FiXCircle />
-
-                </div>
-
-                <div className="pt-1">
-
-                  <p className="font-semibold text-red-600">
-
-                    {formatStatus(
-                      application.status
-                    )}
-
-                    {" • Current"}
-
-                  </p>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    This application is no longer active.
-                  </p>
-
-                </div>
-
-              </div>
-
-            )}
-
-          </div>
+          <ApplicationTimeline
+            status={
+              application.status
+            }
+            appliedAt={
+              application.createdAt
+            }
+            updatedAt={
+              application.updatedAt
+            }
+          />
 
         </div>
 
 
-        {/* ------------------------------------------------
-            Job Details
-        ------------------------------------------------ */}
+        {/* Job Details */}
 
-        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-7">
 
           <h2 className="text-xl font-semibold text-gray-900">
             Job Details
           </h2>
-
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
 
@@ -1077,11 +757,9 @@ const ApplicationDetails = () => {
         </div>
 
 
-        {/* ------------------------------------------------
-            Actions
-        ------------------------------------------------ */}
+        {/* Actions */}
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-3 pb-8 sm:flex-row sm:items-center sm:justify-between">
 
           <button
             onClick={() =>
@@ -1089,7 +767,7 @@ const ApplicationDetails = () => {
                 "/student/applications"
               )
             }
-            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
           >
 
             <FiArrowLeft />
@@ -1105,8 +783,10 @@ const ApplicationDetails = () => {
               onClick={
                 handleWithdraw
               }
-              disabled={withdrawing}
-              className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-5 py-3 font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={
+                withdrawing
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-5 py-3 font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
 
               {withdrawing ? (

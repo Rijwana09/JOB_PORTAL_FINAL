@@ -1,17 +1,107 @@
 @import "tailwindcss";
 
+/*
+|--------------------------------------------------------------------------
+| Global Foundation
+|--------------------------------------------------------------------------
+*/
+
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+  padding: 0;
+
   font-family:
     Inter,
     system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
 
   background: #f8fafc;
+  color: #0f172a;
+
+  /*
+  Prevent horizontal scrolling caused by:
+  - large elements
+  - tables
+  - cards
+  - animations
+  - mobile layouts
+  */
+  overflow-x: hidden;
+
+  /*
+  Better text rendering
+  */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Responsive Media
+|--------------------------------------------------------------------------
+*/
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Form Elements
+|--------------------------------------------------------------------------
+*/
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Buttons
+|--------------------------------------------------------------------------
+*/
+
+button {
+  cursor: pointer;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Accessibility
+|--------------------------------------------------------------------------
+*/
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Mobile Safety
+|--------------------------------------------------------------------------
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

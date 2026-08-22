@@ -28,9 +28,11 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="bg-white py-20 md:py-24">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="bg-white py-14 sm:py-20 md:py-24">
 
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* Section Heading */}
         <motion.div
           initial={{
             opacity: 0,
@@ -46,25 +48,26 @@ export default function Features() {
           viewport={{
             once: true,
           }}
-          className="mx-auto mb-14 max-w-2xl text-center"
+          className="mx-auto mb-10 max-w-2xl text-center sm:mb-14"
         >
 
-          <span className="text-sm font-semibold uppercase tracking-wider text-blue-600">
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 sm:text-sm">
             Why choose us
           </span>
 
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 md:text-4xl">
+          <h2 className="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl md:text-4xl">
             Everything You Need to Build Your Career
           </h2>
 
-          <p className="mt-4 text-slate-600">
+          <p className="mt-3 text-sm leading-6 text-slate-600 sm:mt-4 sm:text-base sm:leading-7">
             A simple platform designed to connect talented candidates
             with the right opportunities.
           </p>
 
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* Feature Cards */}
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
 
           {features.map((feature, index) => {
             const Icon = feature.icon;
@@ -90,18 +93,21 @@ export default function Features() {
                 whileHover={{
                   y: -6,
                 }}
-                className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-lg"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-lg sm:p-8"
               >
 
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50">
-                  <Icon className="text-2xl text-blue-600" />
+                {/* Icon */}
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 sm:mb-6 sm:h-14 sm:w-14">
+                  <Icon className="text-xl text-blue-600 sm:text-2xl" />
                 </div>
 
-                <h3 className="text-xl font-semibold text-slate-900">
+                {/* Title */}
+                <h3 className="text-lg font-semibold text-slate-900 sm:text-xl">
                   {feature.title}
                 </h3>
 
-                <p className="mt-3 leading-7 text-slate-600">
+                {/* Description */}
+                <p className="mt-2 text-sm leading-6 text-slate-600 sm:mt-3 sm:text-base sm:leading-7">
                   {feature.description}
                 </p>
 

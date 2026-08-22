@@ -38,6 +38,7 @@ const StudentProfile = () => {
     setProfile,
   ] = useState(null);
 
+
   /*
   |--------------------------------------------------------------------------
   | Loading State
@@ -48,6 +49,7 @@ const StudentProfile = () => {
     loading,
     setLoading,
   ] = useState(true);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -60,6 +62,7 @@ const StudentProfile = () => {
     setSaving,
   ] = useState(false);
 
+
   /*
   |--------------------------------------------------------------------------
   | Edit Mode
@@ -70,6 +73,7 @@ const StudentProfile = () => {
     editing,
     setEditing,
   ] = useState(false);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -96,59 +100,56 @@ const StudentProfile = () => {
   |--------------------------------------------------------------------------
   */
 
-  const fetchProfile =
-    async () => {
+  const fetchProfile = async () => {
 
-      try {
+    try {
 
-        setLoading(true);
+      setLoading(true);
 
-        const response =
-          await getMyProfile();
+      const response =
+        await getMyProfile();
 
-        const user =
-          response?.data || null;
+      const user =
+        response?.data || null;
 
-        if (!user) {
-          throw new Error(
-            "Profile data not found"
-          );
-        }
-
-        setProfile(user);
-
-        setFormData({
-          name: user.name || "",
-          phone: user.phone || "",
-          location:
-            user.location || "",
-          bio: user.bio || "",
-          education:
-            user.education || "",
-          skills:
-            Array.isArray(user.skills)
-              ? user.skills.join(", ")
-              : "",
-        });
-
-      } catch (error) {
-
-        console.error(
-          "Failed to fetch profile:",
-          error
+      if (!user) {
+        throw new Error(
+          "Profile data not found"
         );
-
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to load profile"
-        );
-
-      } finally {
-
-        setLoading(false);
-
       }
-    };
+
+      setProfile(user);
+
+      setFormData({
+        name: user.name || "",
+        phone: user.phone || "",
+        location: user.location || "",
+        bio: user.bio || "",
+        education: user.education || "",
+        skills: Array.isArray(user.skills)
+          ? user.skills.join(", ")
+          : "",
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Failed to fetch profile:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to load profile"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
 
 
   /*
@@ -170,21 +171,23 @@ const StudentProfile = () => {
   |--------------------------------------------------------------------------
   */
 
-  const handleChange =
-    (event) => {
+  const handleChange = (
+    event
+  ) => {
 
-      const {
-        name,
-        value,
-      } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
-      setFormData(
-        (previous) => ({
-          ...previous,
-          [name]: value,
-        })
-      );
-    };
+    setFormData(
+      (previous) => ({
+        ...previous,
+        [name]: value,
+      })
+    );
+
+  };
 
 
   /*
@@ -193,12 +196,11 @@ const StudentProfile = () => {
   |--------------------------------------------------------------------------
   */
 
-  const handleEdit =
-    () => {
+  const handleEdit = () => {
 
-      setEditing(true);
+    setEditing(true);
 
-    };
+  };
 
 
   /*
@@ -207,30 +209,26 @@ const StudentProfile = () => {
   |--------------------------------------------------------------------------
   */
 
-  const handleCancel =
-    () => {
+  const handleCancel = () => {
 
-      if (!profile) {
-        return;
-      }
+    if (!profile) {
+      return;
+    }
 
-      setFormData({
-        name: profile.name || "",
-        phone: profile.phone || "",
-        location:
-          profile.location || "",
-        bio: profile.bio || "",
-        education:
-          profile.education || "",
-        skills:
-          Array.isArray(profile.skills)
-            ? profile.skills.join(", ")
-            : "",
-      });
+    setFormData({
+      name: profile.name || "",
+      phone: profile.phone || "",
+      location: profile.location || "",
+      bio: profile.bio || "",
+      education: profile.education || "",
+      skills: Array.isArray(profile.skills)
+        ? profile.skills.join(", ")
+        : "",
+    });
 
-      setEditing(false);
+    setEditing(false);
 
-    };
+  };
 
 
   /*
@@ -239,111 +237,121 @@ const StudentProfile = () => {
   |--------------------------------------------------------------------------
   */
 
-  const handleSubmit =
-    async (event) => {
+  const handleSubmit = async (
+    event
+  ) => {
 
-      event.preventDefault();
+    event.preventDefault();
 
-      if (!formData.name.trim()) {
-        toast.error(
-          "Name is required"
+    if (!formData.name.trim()) {
+
+      toast.error(
+        "Name is required"
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      setSaving(true);
+
+      const skills =
+        formData.skills
+          .split(",")
+          .map((skill) =>
+            skill.trim()
+          )
+          .filter(Boolean);
+
+
+      const response =
+        await updateMyProfile({
+          name:
+            formData.name.trim(),
+
+          phone:
+            formData.phone.trim(),
+
+          location:
+            formData.location.trim(),
+
+          bio:
+            formData.bio.trim(),
+
+          education:
+            formData.education.trim(),
+
+          skills,
+        });
+
+
+      const updatedUser =
+        response?.data;
+
+
+      if (updatedUser) {
+
+        setProfile(
+          updatedUser
         );
-        return;
-      }
 
-      try {
+        setFormData({
+          name:
+            updatedUser.name || "",
 
-        setSaving(true);
+          phone:
+            updatedUser.phone || "",
 
-        const skills =
-          formData.skills
-            .split(",")
-            .map((skill) =>
-              skill.trim()
+          location:
+            updatedUser.location || "",
+
+          bio:
+            updatedUser.bio || "",
+
+          education:
+            updatedUser.education || "",
+
+          skills:
+            Array.isArray(
+              updatedUser.skills
             )
-            .filter(Boolean);
-
-        const response =
-          await updateMyProfile({
-            name:
-              formData.name.trim(),
-
-            phone:
-              formData.phone.trim(),
-
-            location:
-              formData.location.trim(),
-
-            bio:
-              formData.bio.trim(),
-
-            education:
-              formData.education.trim(),
-
-            skills,
-          });
-
-        const updatedUser =
-          response?.data;
-
-        if (updatedUser) {
-
-          setProfile(
-            updatedUser
-          );
-
-          setFormData({
-            name:
-              updatedUser.name || "",
-
-            phone:
-              updatedUser.phone || "",
-
-            location:
-              updatedUser.location || "",
-
-            bio:
-              updatedUser.bio || "",
-
-            education:
-              updatedUser.education || "",
-
-            skills:
-              Array.isArray(
-                updatedUser.skills
-              )
-                ? updatedUser.skills.join(
-                    ", "
-                  )
-                : "",
-          });
-
-        }
-
-        setEditing(false);
-
-        toast.success(
-          "Profile updated successfully"
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Failed to update profile:",
-          error
-        );
-
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to update profile"
-        );
-
-      } finally {
-
-        setSaving(false);
+              ? updatedUser.skills.join(
+                  ", "
+                )
+              : "",
+        });
 
       }
-    };
+
+
+      setEditing(false);
+
+      toast.success(
+        "Profile updated successfully"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Failed to update profile:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update profile"
+      );
+
+    } finally {
+
+      setSaving(false);
+
+    }
+
+  };
 
 
   /*
@@ -355,28 +363,29 @@ const StudentProfile = () => {
   if (loading) {
 
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8">
 
-        <div className="mx-auto max-w-5xl">
+      <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-          <div className="flex min-h-[400px] items-center justify-center">
+        <div className="mx-auto flex min-h-[60vh] max-w-5xl items-center justify-center">
 
-            <div className="flex items-center gap-3 text-gray-500">
+          <div className="flex items-center gap-3 text-sm text-gray-500 sm:text-base">
 
-              <FiRefreshCw className="animate-spin text-lg" />
+            <FiRefreshCw
+              className="animate-spin text-lg"
+            />
 
-              <span>
-                Loading profile...
-              </span>
-
-            </div>
+            <span>
+              Loading profile...
+            </span>
 
           </div>
 
         </div>
 
       </div>
+
     );
+
   }
 
 
@@ -389,19 +398,22 @@ const StudentProfile = () => {
   if (!profile) {
 
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8">
 
-        <div className="mx-auto max-w-5xl">
+      <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-          <div className="rounded-2xl border border-red-200 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto flex min-h-[60vh] max-w-5xl items-center justify-center">
 
-            <FiAlertCircle className="mx-auto text-4xl text-red-500" />
+          <div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm sm:p-8">
 
-            <h2 className="mt-4 text-xl font-semibold text-gray-900">
+            <FiAlertCircle
+              className="mx-auto text-4xl text-red-500"
+            />
+
+            <h2 className="mt-4 text-lg font-semibold text-gray-900 sm:text-xl">
               Unable to load profile
             </h2>
 
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-sm leading-6 text-gray-500">
               Something went wrong while
               loading your profile.
             </p>
@@ -409,11 +421,13 @@ const StudentProfile = () => {
             <button
               type="button"
               onClick={fetchProfile}
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
+              className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto"
             >
+
               <FiRefreshCw />
 
               Retry
+
             </button>
 
           </div>
@@ -421,7 +435,9 @@ const StudentProfile = () => {
         </div>
 
       </div>
+
     );
+
   }
 
 
@@ -437,25 +453,58 @@ const StudentProfile = () => {
       ?.toUpperCase() || "U";
 
 
+  /*
+  |--------------------------------------------------------------------------
+  | Created Date
+  |--------------------------------------------------------------------------
+  */
+
+  const createdDate =
+    profile.createdAt
+      ? new Date(
+          profile.createdAt
+        ).toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }
+        )
+      : "N/A";
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | UI
+  |--------------------------------------------------------------------------
+  */
+
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
 
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen bg-gray-50 px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
 
-        {/* ------------------------------------------------
-            Page Header
-        ------------------------------------------------ */}
+      <div className="mx-auto w-full max-w-5xl">
 
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
 
-          <div>
+        {/* ================================================================
+            PAGE HEADER
+        ================================================================ */}
 
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+
+          <div className="min-w-0">
+
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+
               My Profile
+
             </h1>
 
-            <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            <p className="mt-1 max-w-xl text-sm leading-6 text-gray-500 sm:text-base">
+
               Manage your personal and professional information.
+
             </p>
 
           </div>
@@ -466,7 +515,7 @@ const StudentProfile = () => {
             <button
               type="button"
               onClick={handleEdit}
-              className="inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
             >
 
               <FiEdit3 />
@@ -480,50 +529,59 @@ const StudentProfile = () => {
         </div>
 
 
-        {/* ------------------------------------------------
-            Profile Header Card
-        ------------------------------------------------ */}
+        {/* ================================================================
+            PROFILE HEADER CARD
+        ================================================================ */}
 
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
 
-          <div className="h-28 bg-gradient-to-r from-blue-600 to-indigo-600 sm:h-36" />
+          {/* Cover */}
 
-          <div className="px-5 pb-6 sm:px-8">
-
-            <div className="-mt-12 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
-
-              <div className="flex items-end gap-4">
-
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-blue-100 text-3xl font-bold text-blue-600 shadow-md sm:h-28 sm:w-28">
-
-                  {profile.avatar ? (
-
-                    <img
-                      src={profile.avatar}
-                      alt={profile.name}
-                      className="h-full w-full object-cover"
-                    />
-
-                  ) : (
-
-                    profileInitial
-
-                  )}
-
-                </div>
+          <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600 sm:h-32 md:h-36" />
 
 
-                <div className="pb-1">
+          {/* Profile Content */}
 
-                  <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
-                    {profile.name}
-                  </h2>
+          <div className="px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
 
-                  <p className="mt-1 text-sm text-gray-500">
-                    Student
-                  </p>
+            <div className="-mt-10 flex flex-col gap-4 sm:-mt-12 sm:flex-row sm:items-end sm:gap-5">
 
-                </div>
+              {/* Avatar */}
+
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-blue-100 text-2xl font-bold text-blue-600 shadow-md sm:h-24 sm:w-24 sm:text-3xl md:h-28 md:w-28">
+
+                {profile.avatar ? (
+
+                  <img
+                    src={profile.avatar}
+                    alt={profile.name}
+                    className="h-full w-full object-cover"
+                  />
+
+                ) : (
+
+                  profileInitial
+
+                )}
+
+              </div>
+
+
+              {/* Name */}
+
+              <div className="min-w-0 pb-1 sm:pb-2">
+
+                <h2 className="break-words text-xl font-bold text-gray-900 sm:text-2xl">
+
+                  {profile.name}
+
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+
+                  Student
+
+                </p>
 
               </div>
 
@@ -534,41 +592,47 @@ const StudentProfile = () => {
         </div>
 
 
-        {/* ------------------------------------------------
-            Profile Form / Information
-        ------------------------------------------------ */}
+        {/* ================================================================
+            PROFILE FORM
+        ================================================================ */}
 
         <form
           onSubmit={handleSubmit}
-          className="mt-6"
+          className="mt-5 sm:mt-6"
         >
 
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
 
-            {/* ------------------------------------------------
-                Personal Information
-            ------------------------------------------------ */}
 
-            <div className="lg:col-span-2 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+            {/* ============================================================
+                PERSONAL INFORMATION
+            ============================================================ */}
 
-              <div className="mb-6">
+            <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:p-6 lg:col-span-2">
+
+              <div className="mb-5 sm:mb-6">
 
                 <h2 className="text-lg font-semibold text-gray-900">
+
                   Personal Information
+
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm leading-5 text-gray-500">
+
                   Keep your profile information up to date.
+
                 </p>
 
               </div>
 
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+
 
                 {/* Name */}
 
-                <div>
+                <div className="min-w-0">
 
                   <label
                     htmlFor="name"
@@ -579,7 +643,9 @@ const StudentProfile = () => {
 
                   <div className="relative">
 
-                    <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiUser
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
 
                     <input
                       id="name"
@@ -588,7 +654,8 @@ const StudentProfile = () => {
                       value={formData.name}
                       onChange={handleChange}
                       disabled={!editing}
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
+                      autoComplete="name"
+                      className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
                     />
 
                   </div>
@@ -598,7 +665,7 @@ const StudentProfile = () => {
 
                 {/* Email */}
 
-                <div>
+                <div className="min-w-0">
 
                   <label
                     htmlFor="email"
@@ -609,20 +676,27 @@ const StudentProfile = () => {
 
                   <div className="relative">
 
-                    <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiMail
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
 
                     <input
                       id="email"
                       type="email"
-                      value={profile.email || ""}
+                      value={
+                        profile.email || ""
+                      }
                       disabled
-                      className="w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-100 py-2.5 pl-10 pr-3 text-sm text-gray-500"
+                      autoComplete="email"
+                      className="min-h-11 w-full cursor-not-allowed rounded-lg border border-gray-200 bg-gray-100 py-2.5 pl-10 pr-3 text-sm text-gray-500"
                     />
 
                   </div>
 
                   <p className="mt-1.5 text-xs text-gray-400">
+
                     Email cannot be changed here.
+
                   </p>
 
                 </div>
@@ -630,7 +704,7 @@ const StudentProfile = () => {
 
                 {/* Phone */}
 
-                <div>
+                <div className="min-w-0">
 
                   <label
                     htmlFor="phone"
@@ -641,7 +715,9 @@ const StudentProfile = () => {
 
                   <div className="relative">
 
-                    <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiPhone
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
 
                     <input
                       id="phone"
@@ -650,8 +726,9 @@ const StudentProfile = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       disabled={!editing}
+                      autoComplete="tel"
                       placeholder="Enter phone number"
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
+                      className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
                     />
 
                   </div>
@@ -661,7 +738,7 @@ const StudentProfile = () => {
 
                 {/* Location */}
 
-                <div>
+                <div className="min-w-0">
 
                   <label
                     htmlFor="location"
@@ -672,7 +749,9 @@ const StudentProfile = () => {
 
                   <div className="relative">
 
-                    <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiMapPin
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
 
                     <input
                       id="location"
@@ -681,8 +760,9 @@ const StudentProfile = () => {
                       value={formData.location}
                       onChange={handleChange}
                       disabled={!editing}
+                      autoComplete="address-level2"
                       placeholder="e.g. Siliguri, West Bengal"
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
+                      className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
                     />
 
                   </div>
@@ -692,7 +772,7 @@ const StudentProfile = () => {
 
                 {/* Education */}
 
-                <div className="sm:col-span-2">
+                <div className="min-w-0 sm:col-span-2">
 
                   <label
                     htmlFor="education"
@@ -703,7 +783,9 @@ const StudentProfile = () => {
 
                   <div className="relative">
 
-                    <FiBookOpen className="absolute left-3 top-3 text-gray-400" />
+                    <FiBookOpen
+                      className="absolute left-3 top-3 text-gray-400"
+                    />
 
                     <input
                       id="education"
@@ -713,7 +795,7 @@ const StudentProfile = () => {
                       onChange={handleChange}
                       disabled={!editing}
                       placeholder="e.g. B.Tech Computer Science Engineering"
-                      className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
+                      className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
                     />
 
                   </div>
@@ -723,7 +805,7 @@ const StudentProfile = () => {
 
                 {/* Bio */}
 
-                <div className="sm:col-span-2">
+                <div className="min-w-0 sm:col-span-2">
 
                   <label
                     htmlFor="bio"
@@ -735,19 +817,21 @@ const StudentProfile = () => {
                   <textarea
                     id="bio"
                     name="bio"
-                    rows="5"
+                    rows={5}
                     value={formData.bio}
                     onChange={handleChange}
                     disabled={!editing}
                     maxLength={500}
                     placeholder="Tell recruiters a little about yourself..."
-                    className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
+                    className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm leading-6 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:text-gray-600"
                   />
 
                   {editing && (
 
                     <p className="mt-1 text-right text-xs text-gray-400">
+
                       {formData.bio.length}/500
+
                     </p>
 
                   )}
@@ -759,20 +843,24 @@ const StudentProfile = () => {
             </div>
 
 
-            {/* ------------------------------------------------
-                Skills
-            ------------------------------------------------ */}
+            {/* ============================================================
+                SKILLS
+            ============================================================ */}
 
-            <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+            <div className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
 
               <div className="mb-5">
 
                 <h2 className="text-lg font-semibold text-gray-900">
+
                   Skills
+
                 </h2>
 
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm leading-5 text-gray-500">
+
                   Add skills that represent your strengths.
+
                 </p>
 
               </div>
@@ -792,15 +880,17 @@ const StudentProfile = () => {
                   <textarea
                     id="skills"
                     name="skills"
-                    rows="6"
+                    rows={6}
                     value={formData.skills}
                     onChange={handleChange}
                     placeholder="React, JavaScript, Node.js, MongoDB"
-                    className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm leading-6 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   />
 
-                  <p className="mt-2 text-xs text-gray-400">
+                  <p className="mt-2 text-xs leading-5 text-gray-400">
+
                     Separate skills using commas.
+
                   </p>
 
                 </div>
@@ -816,7 +906,7 @@ const StudentProfile = () => {
 
                         <span
                           key={`${skill}-${index}`}
-                          className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700"
+                          className="max-w-full break-words rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700"
                         >
                           {skill}
                         </span>
@@ -827,7 +917,9 @@ const StudentProfile = () => {
                   ) : (
 
                     <p className="text-sm text-gray-400">
+
                       No skills added yet.
+
                     </p>
 
                   )}
@@ -841,19 +933,19 @@ const StudentProfile = () => {
           </div>
 
 
-          {/* ------------------------------------------------
-              Edit Actions
-          ------------------------------------------------ */}
+          {/* ==============================================================
+              EDIT ACTIONS
+          ============================================================== */}
 
           {editing && (
 
-            <div className="mt-6 flex flex-col justify-end gap-3 sm:flex-row">
+            <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:justify-end">
 
               <button
                 type="button"
                 onClick={handleCancel}
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
 
                 <FiX />
@@ -866,23 +958,29 @@ const StudentProfile = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
 
                 {saving ? (
 
                   <>
-                    <FiRefreshCw className="animate-spin" />
+
+                    <FiRefreshCw
+                      className="animate-spin"
+                    />
 
                     Saving...
+
                   </>
 
                 ) : (
 
                   <>
+
                     <FiSave />
 
                     Save Changes
+
                   </>
 
                 )}
@@ -896,37 +994,38 @@ const StudentProfile = () => {
         </form>
 
 
-        {/* ------------------------------------------------
-            Account Information
-        ------------------------------------------------ */}
+        {/* ================================================================
+            ACCOUNT INFORMATION
+        ================================================================ */}
 
-        <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-5 rounded-2xl bg-white p-4 shadow-sm sm:mt-6 sm:p-6">
 
           <div className="flex items-start gap-3">
 
-            <FiCheckCircle className="mt-0.5 shrink-0 text-green-500" />
+            <FiCheckCircle
+              className="mt-0.5 shrink-0 text-green-500"
+            />
 
-            <div>
+            <div className="min-w-0">
 
               <h2 className="font-semibold text-gray-900">
+
                 Account Information
+
               </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm leading-6 text-gray-500">
+
                 Your account was created on{" "}
-                {profile.createdAt
-                  ? new Date(
-                      profile.createdAt
-                    ).toLocaleDateString(
-                      "en-IN",
-                      {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      }
-                    )
-                  : "N/A"}
+
+                <span className="font-medium text-gray-700">
+
+                  {createdDate}
+
+                </span>
+
                 .
+
               </p>
 
             </div>
@@ -938,7 +1037,9 @@ const StudentProfile = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 

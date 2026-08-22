@@ -36,7 +36,6 @@ const RecruiterProfile = () => {
   const [editing, setEditing] =
     useState(false);
 
-
   /*
   |--------------------------------------------------------------------------
   | Form State
@@ -44,15 +43,21 @@ const RecruiterProfile = () => {
   */
 
   const [formData, setFormData] =
-    useState({
-      name: "",
-      phone: "",
-      location: "",
-      bio: "",
-      education: "",
-      skills: [],
-      avatar: "",
-    });
+  useState({
+    name: "",
+    phone: "",
+    location: "",
+    bio: "",
+    education: "",
+    skills: [],
+    avatar: "",
+
+    companyName: "",
+    designation: "",
+    companyWebsite: "",
+    companyDescription: "",
+    companyLinkedIn: "",
+  });
 
 
   const [skillInput, setSkillInput] =
@@ -93,14 +98,24 @@ const RecruiterProfile = () => {
             phone: user.phone || "",
             location: user.location || "",
             bio: user.bio || "",
-            education:
-              user.education || "",
+            education: user.education || "",
             skills:
-              Array.isArray(user.skills)
+                Array.isArray(user.skills)
                 ? user.skills
                 : [],
             avatar: user.avatar || "",
-          });
+
+            companyName:
+                user.companyName || "",
+            designation:
+                user.designation || "",
+            companyWebsite:
+                user.companyWebsite || "",
+            companyDescription:
+                user.companyDescription || "",
+            companyLinkedIn:
+                user.companyLinkedIn || "",
+            });
 
         } catch (error) {
 
@@ -266,20 +281,28 @@ const RecruiterProfile = () => {
     }
 
     setFormData({
-      name: profile.name || "",
-      phone: profile.phone || "",
-      location:
-        profile.location || "",
-      bio: profile.bio || "",
-      education:
-        profile.education || "",
-      skills:
-        Array.isArray(profile.skills)
-          ? profile.skills
-          : [],
-      avatar:
-        profile.avatar || "",
-    });
+        name: profile.name || "",
+        phone: profile.phone || "",
+        location: profile.location || "",
+        bio: profile.bio || "",
+        education: profile.education || "",
+        skills:
+            Array.isArray(profile.skills)
+            ? profile.skills
+            : [],
+        avatar: profile.avatar || "",
+
+        companyName:
+            profile.companyName || "",
+        designation:
+            profile.designation || "",
+        companyWebsite:
+            profile.companyWebsite || "",
+        companyDescription:
+            profile.companyDescription || "",
+        companyLinkedIn:
+            profile.companyLinkedIn || "",
+        });
 
     setSkillInput("");
 
@@ -295,6 +318,43 @@ const RecruiterProfile = () => {
   */
 
   const handleSave = async () => {
+
+    if (!formData.name.trim()) {
+        toast.error("Name is required");
+        return;
+    }
+
+        if (formData.name.trim().length < 2) {
+        toast.error("Name must be at least 2 characters");
+        return;
+        }
+
+        if (formData.bio.length > 500) {
+        toast.error("Bio cannot exceed 500 characters");
+        return;
+        }
+
+        if (formData.skills.length > 30) {
+        toast.error("You can add up to 30 skills");
+        return;
+        }
+
+        if (formData.companyName.length > 100) {
+        toast.error("Company name cannot exceed 100 characters");
+        return;
+        }
+
+        if (formData.designation.length > 100) {
+        toast.error("Designation cannot exceed 100 characters");
+        return;
+        }
+
+        if (formData.companyDescription.length > 1000) {
+        toast.error(
+            "Company description cannot exceed 1000 characters"
+        );
+        return;
+        }
 
     try {
 
@@ -317,25 +377,28 @@ const RecruiterProfile = () => {
       setProfile(updatedUser);
 
       setFormData({
-        name:
-          updatedUser.name || "",
-        phone:
-          updatedUser.phone || "",
-        location:
-          updatedUser.location || "",
-        bio:
-          updatedUser.bio || "",
-        education:
-          updatedUser.education || "",
+        name: updatedUser.name || "",
+        phone: updatedUser.phone || "",
+        location: updatedUser.location || "",
+        bio: updatedUser.bio || "",
+        education: updatedUser.education || "",
         skills:
-          Array.isArray(
-            updatedUser.skills
-          )
+            Array.isArray(updatedUser.skills)
             ? updatedUser.skills
             : [],
-        avatar:
-          updatedUser.avatar || "",
-      });
+        avatar: updatedUser.avatar || "",
+
+        companyName:
+            updatedUser.companyName || "",
+        designation:
+            updatedUser.designation || "",
+        companyWebsite:
+            updatedUser.companyWebsite || "",
+        companyDescription:
+            updatedUser.companyDescription || "",
+        companyLinkedIn:
+            updatedUser.companyLinkedIn || "",
+        });
 
       setEditing(false);
 
@@ -440,6 +503,28 @@ const RecruiterProfile = () => {
     profile.name
       ?.charAt(0)
       ?.toUpperCase() || "R";
+
+        const profileFields = [
+        profile.name,
+        profile.phone,
+        profile.location,
+        profile.bio,
+        profile.education,
+        profile.skills?.length > 0,
+        profile.companyName,
+        profile.designation,
+        profile.companyWebsite,
+        profile.companyDescription,
+        profile.companyLinkedIn,
+        ];
+
+        const completedFields =
+        profileFields.filter(Boolean).length;
+
+        const profileCompletion =
+        Math.round(
+            (completedFields / profileFields.length) * 100
+        );
 
 
   /*
@@ -583,6 +668,49 @@ const RecruiterProfile = () => {
           </div>
 
         </div>
+
+        {/* ------------------------------------------------
+            Profile Completion
+        ------------------------------------------------ */}
+
+            <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-8">
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+                <div>
+
+                <h2 className="text-xl font-semibold text-gray-900">
+                    Profile Completion
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+                    Complete your profile to give candidates more information about you.
+                </p>
+
+                </div>
+
+                <div className="text-2xl font-bold text-blue-600">
+                {profileCompletion}%
+                </div>
+
+            </div>
+
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-gray-100">
+
+                <div
+                className="h-full rounded-full bg-blue-600 transition-all duration-500"
+                style={{
+                    width: `${profileCompletion}%`,
+                }}
+                />
+
+            </div>
+
+            <p className="mt-2 text-xs text-gray-400">
+                {completedFields} of {profileFields.length} profile sections completed
+            </p>
+
+            </div>
 
 
         {/* ------------------------------------------------
@@ -935,6 +1063,195 @@ const RecruiterProfile = () => {
           </div>
 
         </div>
+
+        {/* ------------------------------------------------
+    Company Information
+------------------------------------------------ */}
+
+<div className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-8">
+
+  <div className="mb-6">
+
+    <h2 className="text-xl font-semibold text-gray-900">
+      Company Information
+    </h2>
+
+    <p className="mt-1 text-sm text-gray-500">
+      Information about the company you represent.
+    </p>
+
+  </div>
+
+  <div className="grid gap-6 md:grid-cols-2">
+
+    {/* Company Name */}
+
+    <div>
+
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        Company Name
+      </label>
+
+      {editing ? (
+
+        <input
+          type="text"
+          name="companyName"
+          value={formData.companyName}
+          onChange={handleChange}
+          maxLength={100}
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="Enter company name"
+        />
+
+      ) : (
+
+        <div className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-800">
+          {profile.companyName ||
+            "Not provided"}
+        </div>
+
+      )}
+
+    </div>
+
+
+    {/* Designation */}
+
+    <div>
+
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        Designation
+      </label>
+
+      {editing ? (
+
+        <input
+          type="text"
+          name="designation"
+          value={formData.designation}
+          onChange={handleChange}
+          maxLength={100}
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="e.g. HR Manager"
+        />
+
+      ) : (
+
+        <div className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-800">
+          {profile.designation ||
+            "Not provided"}
+        </div>
+
+      )}
+
+    </div>
+
+
+    {/* Company Website */}
+
+    <div>
+
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        Company Website
+      </label>
+
+      {editing ? (
+
+        <input
+          type="url"
+          name="companyWebsite"
+          value={formData.companyWebsite}
+          onChange={handleChange}
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="https://example.com"
+        />
+
+      ) : (
+
+        <div className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-800 break-all">
+          {profile.companyWebsite ||
+            "Not provided"}
+        </div>
+
+      )}
+
+    </div>
+
+
+    {/* LinkedIn */}
+
+    <div>
+
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        Company LinkedIn
+      </label>
+
+      {editing ? (
+
+        <input
+          type="url"
+          name="companyLinkedIn"
+          value={formData.companyLinkedIn}
+          onChange={handleChange}
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="https://linkedin.com/company/..."
+        />
+
+      ) : (
+
+        <div className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-800 break-all">
+          {profile.companyLinkedIn ||
+            "Not provided"}
+        </div>
+
+      )}
+
+    </div>
+
+  </div>
+
+
+            {/* Company Description */}
+
+            <div className="mt-6">
+
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                Company Description
+                </label>
+
+                {editing ? (
+
+                <>
+
+                    <textarea
+                    name="companyDescription"
+                    value={formData.companyDescription}
+                    onChange={handleChange}
+                    maxLength={1000}
+                    rows={5}
+                    className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="Tell candidates about your company..."
+                    />
+
+                    <p className="mt-1 text-right text-xs text-gray-400">
+                    {formData.companyDescription.length}/1000
+                    </p>
+
+                </>
+
+                ) : (
+
+                <div className="min-h-[100px] rounded-lg bg-gray-50 px-4 py-3 text-sm leading-6 text-gray-700">
+                    {profile.companyDescription ||
+                    "No company description added yet."}
+                </div>
+
+                )}
+
+            </div>
+
+            </div>
 
 
         {/* ------------------------------------------------

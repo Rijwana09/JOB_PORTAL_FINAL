@@ -12,10 +12,14 @@ import {
   FiArrowLeft,
   FiBriefcase,
   FiCalendar,
+  FiCheckCircle,
   FiClock,
   FiDollarSign,
+  FiMail,
   FiMapPin,
   FiRefreshCw,
+  FiUser,
+  FiXCircle,
 } from "react-icons/fi";
 
 import {
@@ -26,6 +30,7 @@ import toast from "react-hot-toast";
 
 import {
   getApplicationById,
+  updateApplicationStatus,
 } from "../../api/applicationApi";
 
 import ApplicationStatus from "../../components/Application/ApplicationStatus";
@@ -57,44 +62,25 @@ const pageVariants = {
 const itemVariants = {
   hidden: {
     opacity: 0,
-    y: 20,
+    y: 15,
   },
 
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4,
+      duration: 0.35,
       ease: "easeOut",
     },
   },
 };
 
 
-const buttonVariants = {
-  hover: {
-    x: 2,
-    transition: {
-      duration: 0.2,
-    },
-  },
-
-  tap: {
-    scale: 0.97,
-  },
-};
-
-
-const cardHoverVariants = {
-  hover: {
-    y: -2,
-    transition: {
-      duration: 0.2,
-      ease: "easeOut",
-    },
-  },
-};
-
+/*
+|--------------------------------------------------------------------------
+| Component
+|--------------------------------------------------------------------------
+*/
 
 const ApplicationDetails = () => {
 
@@ -118,59 +104,84 @@ const ApplicationDetails = () => {
   ] = useState(true);
 
 
+  const [
+    updatingStatus,
+    setUpdatingStatus,
+  ] = useState(false);
+
+
+  const [
+    selectedStatus,
+    setSelectedStatus,
+  ] = useState("");
+
+
   /*
   |--------------------------------------------------------------------------
   | Fetch Application
   |--------------------------------------------------------------------------
   */
 
+  const fetchApplication =
+    async () => {
+
+      try {
+
+        setLoading(true);
+
+        const response =
+          await getApplicationById(
+            applicationId
+          );
+
+        console.log(
+          "Recruiter Application Details:",
+          response
+        );
+
+        const applicationData =
+          response?.data || null;
+
+        setApplication(
+          applicationData
+        );
+
+        setSelectedStatus(
+          applicationData?.status || ""
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Failed to fetch recruiter application:",
+          error
+        );
+
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to load application details"
+        );
+
+        navigate(
+          "/recruiter/applications"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Initial Load
+  |--------------------------------------------------------------------------
+  */
+
   useEffect(() => {
-
-    const fetchApplication =
-      async () => {
-
-        try {
-
-          setLoading(true);
-
-          const response =
-            await getApplicationById(
-              applicationId
-            );
-
-          console.log(
-            "Application Details API Response:",
-            response
-          );
-
-          setApplication(
-            response?.data || null
-          );
-
-        } catch (error) {
-
-          console.error(
-            "Failed to fetch application:",
-            error
-          );
-
-          toast.error(
-            error.response?.data?.message ||
-              "Failed to load application details"
-          );
-
-          navigate(
-            "/student/applications"
-          );
-
-        } finally {
-
-          setLoading(false);
-
-        }
-
-      };
-
 
     if (applicationId) {
       fetchApplication();
@@ -178,126 +189,70 @@ const ApplicationDetails = () => {
 
   }, [
     applicationId,
-    navigate,
   ]);
 
 
   /*
   |--------------------------------------------------------------------------
-  | Loading State
+  | Update Status
   |--------------------------------------------------------------------------
   */
 
-  if (loading) {
+  const handleStatusUpdate =
+    async () => {
 
-    return (
-      <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        transition={{
-          duration: 0.25,
-        }}
-        className="flex min-h-screen items-center justify-center bg-gray-50 px-4"
-      >
+      if (!application?._id) {
+        return;
+      }
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.3,
-          }}
-          className="flex items-center gap-3 text-center text-gray-500"
-        >
+      if (
+        !selectedStatus ||
+        selectedStatus === application.status
+      ) {
+        return;
+      }
 
-          <FiRefreshCw className="shrink-0 animate-spin" />
+      try {
 
-          <span>
-            Loading application...
-          </span>
+        setUpdatingStatus(true);
 
-        </motion.div>
+        const response =
+          await updateApplicationStatus(
+            application._id,
+            selectedStatus
+          );
 
-      </motion.div>
-    );
+        toast.success(
+          response?.message ||
+            response?.data?.message ||
+            "Application status updated successfully"
+        );
 
-  }
+        await fetchApplication();
 
+      } catch (error) {
 
-  /*
-  |--------------------------------------------------------------------------
-  | Application Not Found
-  |--------------------------------------------------------------------------
-  */
+        console.error(
+          "Failed to update application status:",
+          error
+        );
 
-  if (!application) {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to update application status"
+        );
 
-    return (
-      <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 1,
-        }}
-        className="flex min-h-screen items-center justify-center bg-gray-50 px-4"
-      >
+        setSelectedStatus(
+          application.status
+        );
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            scale: 0.96,
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-          }}
-          transition={{
-            duration: 0.3,
-          }}
-          className="w-full max-w-md rounded-xl bg-white p-6 text-center shadow-sm sm:p-8"
-        >
+      } finally {
 
-          <h2 className="text-xl font-semibold text-gray-800">
-            Application not found
-          </h2>
+        setUpdatingStatus(false);
 
-          <motion.button
-            whileHover={{
-              scale: 1.02,
-            }}
-            whileTap={{
-              scale: 0.97,
-            }}
-            onClick={() =>
-              navigate(
-                "/student/applications"
-              )
-            }
-            className="mt-4 w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto"
-          >
-            Back to Applications
-          </motion.button>
+      }
 
-        </motion.div>
-
-      </motion.div>
-    );
-
-  }
-
-
-  const job =
-    application.job;
+    };
 
 
   /*
@@ -313,7 +268,18 @@ const ApplicationDetails = () => {
         return "N/A";
       }
 
-      return new Date(date).toLocaleDateString(
+      const parsedDate =
+        new Date(date);
+
+      if (
+        Number.isNaN(
+          parsedDate.getTime()
+        )
+      ) {
+        return "N/A";
+      }
+
+      return parsedDate.toLocaleDateString(
         "en-IN",
         {
           day: "2-digit",
@@ -327,39 +293,182 @@ const ApplicationDetails = () => {
 
   /*
   |--------------------------------------------------------------------------
+  | Format Date Time
+  |--------------------------------------------------------------------------
+  */
+
+  const formatDateTime =
+    (date) => {
+
+      if (!date) {
+        return "N/A";
+      }
+
+      const parsedDate =
+        new Date(date);
+
+      if (
+        Number.isNaN(
+          parsedDate.getTime()
+        )
+      ) {
+        return "N/A";
+      }
+
+      return parsedDate.toLocaleString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      );
+
+    };
+
+
+  /*
+  |--------------------------------------------------------------------------
   | Format Salary
   |--------------------------------------------------------------------------
   */
 
-  const formatSalary = () => {
+  const formatSalary =
+    (salary) => {
 
-    if (!job?.salary) {
+      if (!salary) {
+        return "Not specified";
+      }
+
+      if (
+        typeof salary === "string" ||
+        typeof salary === "number"
+      ) {
+        return String(salary);
+      }
+
+      const {
+        min,
+        max,
+      } = salary;
+
+      if (
+        min !== undefined &&
+        max !== undefined
+      ) {
+        return `₹${min} - ₹${max}`;
+      }
+
+      if (
+        min !== undefined
+      ) {
+        return `₹${min}+`;
+      }
+
+      if (
+        max !== undefined
+      ) {
+        return `Up to ₹${max}`;
+      }
+
       return "Not specified";
-    }
 
-    const {
-      min,
-      max,
-    } = job.salary;
+    };
 
-    if (
-      min !== undefined &&
-      max !== undefined
-    ) {
-      return `₹${min} - ₹${max}`;
-    }
 
-    if (min !== undefined) {
-      return `₹${min}`;
-    }
+  /*
+  |--------------------------------------------------------------------------
+  | Loading
+  |--------------------------------------------------------------------------
+  */
 
-    if (max !== undefined) {
-      return `₹${max}`;
-    }
+  if (loading) {
 
-    return "Not specified";
-  };
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
 
+        <div className="flex items-center gap-3 text-gray-500">
+
+          <FiRefreshCw
+            className="animate-spin"
+          />
+
+          <span>
+            Loading application...
+          </span>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Not Found
+  |--------------------------------------------------------------------------
+  */
+
+  if (!application) {
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
+
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+
+            <FiXCircle className="text-2xl text-gray-500" />
+
+          </div>
+
+          <h2 className="mt-5 text-xl font-semibold text-gray-900">
+            Application Not Found
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-500">
+            The application you're looking for could not be found.
+          </p>
+
+          <button
+            onClick={() =>
+              navigate(
+                "/recruiter/applications"
+              )
+            }
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
+          >
+
+            <FiArrowLeft />
+
+            Back to Applications
+
+          </button>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  const job =
+    application.job;
+
+  const student =
+    application.student;
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | UI
+  |--------------------------------------------------------------------------
+  */
 
   return (
 
@@ -370,167 +479,247 @@ const ApplicationDetails = () => {
       className="min-h-screen bg-gray-50"
     >
 
-      <div className="mx-auto w-full max-w-5xl px-3 py-5 sm:px-5 sm:py-7 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
 
 
         {/* ------------------------------------------------
-            Back Button
+            Back
         ------------------------------------------------ */}
 
-        <motion.button
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
+        <button
           onClick={() =>
             navigate(
-              "/student/applications"
+              "/recruiter/applications"
             )
           }
-          className="mb-5 flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-blue-600 sm:mb-6"
+          className="mb-6 inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-blue-600"
         >
 
-          <FiArrowLeft className="shrink-0" />
+          <FiArrowLeft />
 
-          <span>
-            Back to My Applications
-          </span>
+          Back to Applications
 
-        </motion.button>
+        </button>
 
 
         {/* ------------------------------------------------
-            Application Header
+            Header
         ------------------------------------------------ */}
 
         <motion.div
           variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-          className="rounded-xl bg-white p-4 shadow-sm sm:p-6"
+          className="rounded-2xl bg-white p-5 shadow-sm sm:p-7"
         >
 
-          <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
 
             <div className="min-w-0">
 
-              <h1 className="break-words text-xl font-bold leading-tight text-gray-900 sm:text-2xl md:text-3xl">
-                {job?.title || "Job Title"}
+              <p className="text-sm font-medium text-blue-600">
+                Candidate Application
+              </p>
+
+              <h1 className="mt-1 break-words text-2xl font-bold text-gray-900 sm:text-3xl">
+                {student?.name ||
+                  "Unknown Candidate"}
               </h1>
 
-              <p className="mt-2 break-words text-base text-gray-500 sm:text-lg">
-                {job?.company || "Company"}
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-500">
+
+                <span className="inline-flex items-center gap-2">
+                  <FiMail className="text-blue-600" />
+                  {student?.email ||
+                    "No email available"}
+                </span>
+
+                {job?.title && (
+                  <span className="inline-flex items-center gap-2">
+                    <FiBriefcase className="text-blue-600" />
+                    {job.title}
+                  </span>
+                )}
+
+              </div>
+
+            </div>
+
+
+            <div className="shrink-0">
+
+              <ApplicationStatus
+                status={
+                  application.status
+                }
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* Application metadata */}
+
+          <div className="mt-6 grid gap-3 border-t pt-6 sm:grid-cols-2 lg:grid-cols-4">
+
+            <div className="rounded-lg bg-gray-50 p-4">
+
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Applied
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-gray-800">
+                {formatDate(
+                  application.createdAt
+                )}
               </p>
 
             </div>
 
 
-            <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.9,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-              }}
-              transition={{
-                delay: 0.15,
-                duration: 0.3,
-              }}
-              className="shrink-0"
-            >
+            <div className="rounded-lg bg-gray-50 p-4">
 
-              <ApplicationStatus
-                status={application.status}
-              />
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Last Updated
+              </p>
 
-            </motion.div>
+              <p className="mt-1 text-sm font-semibold text-gray-800">
+                {formatDate(
+                  application.updatedAt
+                )}
+              </p>
+
+            </div>
+
+
+            <div className="rounded-lg bg-gray-50 p-4">
+
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Application ID
+              </p>
+
+              <p className="mt-1 break-all text-sm font-semibold text-gray-800">
+                {application._id}
+              </p>
+
+            </div>
+
+
+            <div className="rounded-lg bg-gray-50 p-4">
+
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Current Status
+              </p>
+
+              <div className="mt-2">
+
+                <ApplicationStatus
+                  status={
+                    application.status
+                  }
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </motion.div>
+
+
+        {/* ------------------------------------------------
+            Candidate Information
+        ------------------------------------------------ */}
+
+        <motion.div
+          variants={itemVariants}
+          className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-7"
+        >
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+
+              <FiUser className="text-xl" />
+
+            </div>
+
+            <div>
+
+              <h2 className="text-xl font-semibold text-gray-900">
+                Candidate Information
+              </h2>
+
+              <p className="text-sm text-gray-500">
+                Applicant details
+              </p>
+
+            </div>
 
           </div>
 
 
-          {/* ------------------------------------------------
-              Job Information Grid
-          ------------------------------------------------ */}
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
 
-          <div className="mt-5 grid grid-cols-1 gap-3 border-t pt-5 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6 lg:grid-cols-3">
+            <div>
 
-            {[
-              {
-                icon: FiMapPin,
-                value: job?.location || "N/A",
-              },
+              <p className="text-sm text-gray-500">
+                Full Name
+              </p>
 
-              {
-                icon: FiBriefcase,
-                value: job?.jobType || "N/A",
-              },
+              <p className="mt-1 font-medium text-gray-800">
+                {student?.name ||
+                  "N/A"}
+              </p>
 
-              {
-                icon: FiClock,
-                value: job?.workMode || "N/A",
-              },
+            </div>
 
-              {
-                icon: FiDollarSign,
-                value: formatSalary(),
-              },
 
-              {
-                icon: FiCalendar,
-                value: `Applied on ${formatDate(
-                  application.createdAt
-                )}`,
-              },
+            <div>
 
-              {
-                icon: FiCalendar,
-                value: `Updated on ${formatDate(
-                  application.updatedAt
-                )}`,
-              },
-            ].map(
-              (
-                item,
-                index
-              ) => {
+              <p className="text-sm text-gray-500">
+                Email
+              </p>
 
-                const Icon =
-                  item.icon;
+              <p className="mt-1 break-all font-medium text-gray-800">
+                {student?.email ||
+                  "N/A"}
+              </p>
 
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{
-                      opacity: 0,
-                      y: 10,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{
-                      delay:
-                        0.15 +
-                        index * 0.05,
-                      duration: 0.3,
-                    }}
-                    whileHover={{
-                      y: -2,
-                    }}
-                    className="flex min-w-0 items-center gap-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-600"
-                  >
+            </div>
 
-                    <Icon className="shrink-0 text-blue-600" />
 
-                    <span className="break-words">
-                      {item.value}
-                    </span>
+            {student?.phone && (
 
-                  </motion.div>
-                );
-              }
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Phone
+                </p>
+
+                <p className="mt-1 font-medium text-gray-800">
+                  {student.phone}
+                </p>
+
+              </div>
+
+            )}
+
+
+            {student?.location && (
+
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Location
+                </p>
+
+                <p className="mt-1 font-medium text-gray-800">
+                  {student.location}
+                </p>
+
+              </div>
+
             )}
 
           </div>
@@ -539,104 +728,142 @@ const ApplicationDetails = () => {
 
 
         {/* ------------------------------------------------
-            Application Information
+            Job Information
         ------------------------------------------------ */}
 
         <motion.div
           variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{
-            delay: 0.15,
-          }}
-          className="mt-5 rounded-xl bg-white p-4 shadow-sm sm:mt-6 sm:p-6"
+          className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-7"
         >
 
-          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
-            Application Information
+          <h2 className="text-xl font-semibold text-gray-900">
+            Job Information
           </h2>
 
 
-          <div className="mt-4 divide-y">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
-            <motion.div
-              whileHover={{
-                x: 2,
-              }}
-              className="flex flex-col gap-1 py-4 first:pt-0 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
-            >
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
 
-              <span className="shrink-0 text-sm text-gray-500">
-                Application ID
-              </span>
+              <FiBriefcase className="shrink-0 text-blue-600" />
 
-              <span className="break-all text-sm font-medium text-gray-800 sm:text-right">
-                {application._id}
-              </span>
+              <div>
 
-            </motion.div>
+                <p className="text-xs text-gray-500">
+                  Job
+                </p>
 
-
-            <motion.div
-              whileHover={{
-                x: 2,
-              }}
-              className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-            >
-
-              <span className="text-sm text-gray-500">
-                Current Status
-              </span>
-
-              <div className="sm:text-right">
-
-                <ApplicationStatus
-                  status={application.status}
-                />
+                <p className="font-medium text-gray-800">
+                  {job?.title ||
+                    "N/A"}
+                </p>
 
               </div>
 
-            </motion.div>
+            </div>
 
 
-            <motion.div
-              whileHover={{
-                x: 2,
-              }}
-              className="flex flex-col gap-1 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-            >
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
 
-              <span className="text-sm text-gray-500">
-                Application Date
-              </span>
+              <FiMapPin className="shrink-0 text-blue-600" />
 
-              <span className="text-sm font-medium text-gray-800 sm:text-right">
-                {formatDate(
-                  application.createdAt
-                )}
-              </span>
+              <div>
 
-            </motion.div>
+                <p className="text-xs text-gray-500">
+                  Location
+                </p>
+
+                <p className="font-medium text-gray-800">
+                  {job?.location ||
+                    "N/A"}
+                </p>
+
+              </div>
+
+            </div>
 
 
-            <motion.div
-              whileHover={{
-                x: 2,
-              }}
-              className="flex flex-col gap-1 py-4 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-            >
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
 
-              <span className="text-sm text-gray-500">
-                Last Updated
-              </span>
+              <FiClock className="shrink-0 text-blue-600" />
 
-              <span className="text-sm font-medium text-gray-800 sm:text-right">
-                {formatDate(
-                  application.updatedAt
-                )}
-              </span>
+              <div>
 
-            </motion.div>
+                <p className="text-xs text-gray-500">
+                  Work Mode
+                </p>
+
+                <p className="font-medium text-gray-800">
+                  {job?.workMode ||
+                    "N/A"}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+
+              <FiDollarSign className="shrink-0 text-blue-600" />
+
+              <div>
+
+                <p className="text-xs text-gray-500">
+                  Salary
+                </p>
+
+                <p className="font-medium text-gray-800">
+                  {formatSalary(
+                    job?.salary
+                  )}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+
+              <FiCalendar className="shrink-0 text-blue-600" />
+
+              <div>
+
+                <p className="text-xs text-gray-500">
+                  Applied On
+                </p>
+
+                <p className="font-medium text-gray-800">
+                  {formatDate(
+                    application.createdAt
+                  )}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-4">
+
+              <FiCalendar className="shrink-0 text-blue-600" />
+
+              <div>
+
+                <p className="text-xs text-gray-500">
+                  Deadline
+                </p>
+
+                <p className="font-medium text-gray-800">
+                  {formatDate(
+                    job?.applicationDeadline
+                  )}
+                </p>
+
+              </div>
+
+            </div>
 
           </div>
 
@@ -644,117 +871,113 @@ const ApplicationDetails = () => {
 
 
         {/* ------------------------------------------------
-            Application Timeline
+            Application Progress
         ------------------------------------------------ */}
 
         <motion.div
           variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{
-            delay: 0.25,
-          }}
-          className="mt-5 sm:mt-6"
+          className="mt-6"
         >
 
           <ApplicationTimeline
-            status={application.status}
-            appliedAt={application.createdAt}
-            updatedAt={application.updatedAt}
+            status={
+              application.status
+            }
+            appliedAt={
+              application.createdAt
+            }
+            updatedAt={
+              application.updatedAt
+            }
           />
 
         </motion.div>
 
 
         {/* ------------------------------------------------
-            Job Details
+            Update Status
         ------------------------------------------------ */}
 
         <motion.div
           variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{
-            delay: 0.3,
-          }}
-          className="mt-5 rounded-xl bg-white p-4 shadow-sm sm:mt-6 sm:p-6"
+          className="mt-6 rounded-2xl bg-white p-5 shadow-sm sm:p-7"
         >
 
-          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
-            Job Details
-          </h2>
+          <div>
+
+            <h2 className="text-xl font-semibold text-gray-900">
+              Update Application Status
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Change the candidate's application status.
+            </p>
+
+          </div>
 
 
-          <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 sm:mt-5 sm:grid-cols-2">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
 
-            {[
-              {
-                label: "Experience Level",
-                value:
-                  job?.experienceLevel ||
-                  "N/A",
-              },
+            <select
+              value={selectedStatus}
+              onChange={(event) =>
+                setSelectedStatus(
+                  event.target.value
+                )
+              }
+              disabled={
+                updatingStatus
+              }
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:max-w-xs"
+            >
 
-              {
-                label: "Job Type",
-                value:
-                  job?.jobType ||
-                  "N/A",
-              },
+              <option value="applied">
+                Applied
+              </option>
 
-              {
-                label: "Work Mode",
-                value:
-                  job?.workMode ||
-                  "N/A",
-              },
+              <option value="shortlisted">
+                Shortlisted
+              </option>
 
-              {
-                label: "Application Deadline",
-                value:
-                  formatDate(
-                    job?.applicationDeadline
-                  ),
-              },
-            ].map(
-              (
-                item,
-                index
-              ) => (
+              <option value="rejected">
+                Rejected
+              </option>
 
-                <motion.div
-                  key={item.label}
-                  initial={{
-                    opacity: 0,
-                    y: 10,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    delay:
-                      0.35 +
-                      index * 0.05,
-                    duration: 0.3,
-                  }}
-                  whileHover={{
-                    x: 2,
-                  }}
-                >
+              <option value="hired">
+                Hired
+              </option>
 
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500 sm:text-sm">
-                    {item.label}
-                  </p>
+            </select>
 
-                  <p className="mt-1 break-words text-sm font-medium text-gray-800 sm:text-base">
-                    {item.value}
-                  </p>
 
-                </motion.div>
+            <button
+              type="button"
+              onClick={
+                handleStatusUpdate
+              }
+              disabled={
+                updatingStatus ||
+                selectedStatus ===
+                  application.status
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
 
-              )
-            )}
+              {updatingStatus ? (
+                <>
+                  <FiRefreshCw className="animate-spin" />
+
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <FiCheckCircle />
+
+                  Update Status
+                </>
+              )}
+
+            </button>
 
           </div>
 
@@ -762,49 +985,55 @@ const ApplicationDetails = () => {
 
 
         {/* ------------------------------------------------
-            Bottom Action
+            Bottom Actions
         ------------------------------------------------ */}
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.4,
-            duration: 0.3,
-          }}
-          className="mt-5 pb-5 sm:mt-6 sm:pb-8"
-        >
+        <div className="mt-6 flex flex-col gap-3 pb-8 sm:flex-row sm:justify-between">
 
-          <motion.button
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
+          <button
             onClick={() =>
               navigate(
-                "/student/applications"
+                "/recruiter/applications"
               )
             }
-            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
           >
 
             <FiArrowLeft />
 
-            Back to My Applications
+            Back to Applications
 
-          </motion.button>
+          </button>
 
-        </motion.div>
+
+          <button
+            onClick={
+              fetchApplication
+            }
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+          >
+
+            <FiRefreshCw
+              className={
+                loading
+                  ? "animate-spin"
+                  : ""
+              }
+            />
+
+            Refresh
+
+          </button>
+
+        </div>
 
       </div>
 
     </motion.div>
+
   );
+
 };
 
 

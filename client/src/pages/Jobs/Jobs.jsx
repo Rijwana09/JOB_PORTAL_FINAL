@@ -164,12 +164,6 @@ const Jobs = () => {
       });
 
 
-      /*
-      |--------------------------------------------------------------------------
-      | Response Validation
-      |--------------------------------------------------------------------------
-      */
-
       const responseData =
         response?.data;
 
@@ -275,13 +269,6 @@ const Jobs = () => {
       trimmedSearch
     );
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Keep URL in sync
-    |--------------------------------------------------------------------------
-    */
-
     const params = {};
 
     if (trimmedSearch) {
@@ -313,7 +300,6 @@ const Jobs = () => {
       newSortBy,
       newSortOrder,
     ] = value.split("-");
-
 
     setSortBy(
       newSortBy
@@ -361,6 +347,8 @@ const Jobs = () => {
 
     setSearchParams({});
 
+    setMobileFiltersOpen(false);
+
   };
 
 
@@ -394,7 +382,7 @@ const Jobs = () => {
 
         <div className="flex items-center gap-2">
 
-          <FiSliders className="text-blue-600" />
+          <FiSliders className="shrink-0 text-blue-600" />
 
           <h2 className="text-lg font-semibold text-slate-900">
             Filters
@@ -413,7 +401,7 @@ const Jobs = () => {
 
       {/* Job Type */}
 
-      <div className="mt-6">
+      <div className="mt-5">
 
         <label
           htmlFor="jobType"
@@ -434,7 +422,7 @@ const Jobs = () => {
             setPage(1);
 
           }}
-          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         >
 
           <option value="">
@@ -489,7 +477,7 @@ const Jobs = () => {
             setPage(1);
 
           }}
-          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         >
 
           <option value="">
@@ -536,7 +524,7 @@ const Jobs = () => {
             setPage(1);
 
           }}
-          className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         >
 
           <option value="">
@@ -589,10 +577,10 @@ const Jobs = () => {
             setPage(1);
 
           }}
-          className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="mt-2 min-h-11 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
 
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs leading-5 text-slate-400">
           Separate multiple skills with commas
         </p>
 
@@ -623,7 +611,7 @@ const Jobs = () => {
               setPage(1);
 
             }}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
+            className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
           />
 
           <input
@@ -640,7 +628,7 @@ const Jobs = () => {
               setPage(1);
 
             }}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
+            className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
           />
 
         </div>
@@ -659,7 +647,7 @@ const Jobs = () => {
         <button
           type="button"
           onClick={clearFilters}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
         >
 
           <FiX />
@@ -677,7 +665,7 @@ const Jobs = () => {
 
   return (
 
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen overflow-x-hidden bg-slate-50">
 
 
       {/* ================================================================
@@ -686,7 +674,7 @@ const Jobs = () => {
 
       <section className="border-b bg-white">
 
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
 
           <motion.div
             initial={{
@@ -702,11 +690,11 @@ const Jobs = () => {
             }}
           >
 
-            <h1 className="text-3xl font-bold text-slate-900 md:text-4xl">
+            <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl md:text-4xl">
               Find Your Dream Job
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
               Search and filter opportunities that match your skills.
             </p>
 
@@ -729,13 +717,15 @@ const Jobs = () => {
               delay: 0.15,
               duration: 0.5,
             }}
-            className="mt-7 flex flex-col gap-3 md:flex-row"
+            className="mt-6 flex flex-col gap-3 sm:mt-7 lg:flex-row"
           >
 
-            <div className="relative flex-1">
+            {/* Search Input */}
+
+            <div className="relative min-w-0 flex-1">
 
               <FiSearch
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
               />
 
               <input
@@ -747,11 +737,13 @@ const Jobs = () => {
                     e.target.value
                   )
                 }
-                className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="min-h-12 w-full min-w-0 rounded-xl border border-slate-300 bg-white py-3.5 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
             </div>
 
+
+            {/* Location */}
 
             <input
               type="text"
@@ -766,13 +758,15 @@ const Jobs = () => {
                 setPage(1);
 
               }}
-              className="rounded-xl border border-slate-300 px-4 py-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:w-60"
+              className="min-h-12 w-full min-w-0 rounded-xl border border-slate-300 px-4 py-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 lg:w-60"
             />
 
 
+            {/* Search Button */}
+
             <button
               type="submit"
-              className="rounded-xl bg-blue-600 px-7 py-3.5 font-medium text-white transition hover:bg-blue-700 active:scale-[0.98]"
+              className="min-h-12 w-full rounded-xl bg-blue-600 px-7 py-3.5 font-medium text-white transition hover:bg-blue-700 active:scale-[0.98] lg:w-auto"
             >
               Search
             </button>
@@ -788,9 +782,12 @@ const Jobs = () => {
           CONTENT
       ================================================================= */}
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-        {/* Mobile Filters */}
+
+        {/* ==============================================================
+            MOBILE FILTERS
+        ============================================================== */}
 
         <div className="mb-5 lg:hidden">
 
@@ -801,12 +798,14 @@ const Jobs = () => {
                 !mobileFiltersOpen
               )
             }
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium text-slate-700 shadow-sm"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
           >
 
             <FiSliders />
 
-            Filters
+            <span>
+              Filters
+            </span>
 
             {activeFilterCount > 0 && (
               <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
@@ -819,18 +818,28 @@ const Jobs = () => {
 
           {mobileFiltersOpen && (
 
-            <div className="mt-3 rounded-xl bg-white p-5 shadow-sm">
+            <motion.div
+              initial={{
+                opacity: 0,
+                height: 0,
+              }}
+              animate={{
+                opacity: 1,
+                height: "auto",
+              }}
+              className="mt-3 overflow-hidden rounded-xl bg-white p-4 shadow-sm sm:p-5"
+            >
 
               <Filters />
 
-            </div>
+            </motion.div>
 
           )}
 
         </div>
 
 
-        <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[250px_minmax(0,1fr)]">
 
 
           {/* ============================================================
@@ -848,36 +857,34 @@ const Jobs = () => {
               JOBS
           ============================================================= */}
 
-          <main>
+          <main className="min-w-0">
+
+            {/* Results + Sort */}
 
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-              <div>
+              <p className="text-sm text-slate-500">
 
-                <p className="text-sm text-slate-500">
+                {pagination.totalJobs}
 
-                  {pagination.totalJobs}
+                {" "}
 
-                  {" "}
+                {pagination.totalJobs === 1
+                  ? "job"
+                  : "jobs"}{" "}
 
-                  {pagination.totalJobs === 1
-                    ? "job"
-                    : "jobs"}{" "}
+                found
 
-                  found
-
-                </p>
-
-              </div>
+              </p>
 
 
               {/* Sort */}
 
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
 
                 <label
                   htmlFor="sort"
-                  className="text-sm font-medium text-slate-700"
+                  className="shrink-0 text-sm font-medium text-slate-700"
                 >
                   Sort by:
                 </label>
@@ -890,7 +897,7 @@ const Jobs = () => {
                       e.target.value
                     )
                   }
-                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                  className="min-h-10 min-w-0 max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
                 >
 
                   <option value="createdAt-desc">
@@ -928,7 +935,7 @@ const Jobs = () => {
 
             {loading ? (
 
-              <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2">
 
                 {[1, 2, 3, 4].map(
                   (item) => (
@@ -956,14 +963,14 @@ const Jobs = () => {
                   opacity: 1,
                   y: 0,
                 }}
-                className="rounded-xl bg-white px-6 py-20 text-center shadow-sm"
+                className="rounded-xl bg-white px-4 py-16 text-center shadow-sm sm:px-6 sm:py-20"
               >
 
                 <div className="mx-auto max-w-md">
 
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 sm:h-16 sm:w-16">
 
-                    <FiSearch className="text-2xl text-slate-400" />
+                    <FiSearch className="text-xl text-slate-400 sm:text-2xl" />
 
                   </div>
 
@@ -979,7 +986,7 @@ const Jobs = () => {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="mt-6 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+                    className="mt-6 min-h-11 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
                   >
                     Clear Filters
                   </button>
@@ -1002,7 +1009,7 @@ const Jobs = () => {
                 transition={{
                   duration: 0.4,
                 }}
-                className="grid gap-5 md:grid-cols-2"
+                className="grid min-w-0 gap-4 sm:gap-5 md:grid-cols-2"
               >
 
                 {jobs.map(
@@ -1022,6 +1029,7 @@ const Jobs = () => {
                         delay:
                           index * 0.05,
                       }}
+                      className="min-w-0"
                     >
 
                       <JobCard
@@ -1045,7 +1053,7 @@ const Jobs = () => {
             {!loading &&
               pagination.totalPages > 1 && (
 
-                <div className="mt-8 flex items-center justify-center gap-4">
+                <div className="mt-8 flex items-center justify-center gap-3 sm:gap-4">
 
                   <button
                     type="button"
@@ -1070,7 +1078,7 @@ const Jobs = () => {
                       }
 
                     }}
-                    className="rounded-lg border border-slate-300 bg-white p-2.5 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label="Previous page"
                   >
 
@@ -1079,7 +1087,7 @@ const Jobs = () => {
                   </button>
 
 
-                  <span className="text-sm text-slate-600">
+                  <span className="whitespace-nowrap text-sm text-slate-600">
 
                     Page{" "}
 
@@ -1119,7 +1127,7 @@ const Jobs = () => {
                       }
 
                     }}
-                    className="rounded-lg border border-slate-300 bg-white p-2.5 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label="Next page"
                   >
 

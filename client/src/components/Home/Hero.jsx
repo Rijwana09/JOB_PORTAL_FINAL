@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaSearch, FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
+import {
+  FaSearch,
+  FaMapMarkerAlt,
+  FaArrowRight,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
@@ -31,15 +35,23 @@ export default function Hero() {
     );
   };
 
+  const handlePopularSearch = (item) => {
+    setSearch(item);
+
+    navigate(
+      `/jobs?search=${encodeURIComponent(item)}`
+    );
+  };
+
   return (
-    <section className="relative overflow-hidden bg-slate-50 py-20 md:py-28">
+    <section className="relative overflow-hidden bg-slate-50 py-14 sm:py-20 md:py-28">
 
-      {/* Background decoration */}
-      <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-blue-100 opacity-50 blur-3xl" />
+      {/* Background Decoration */}
+      <div className="pointer-events-none absolute -left-32 -top-24 h-64 w-64 rounded-full bg-blue-100 opacity-50 blur-3xl sm:h-72 sm:w-72" />
 
-      <div className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-indigo-100 opacity-50 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-32 h-64 w-64 rounded-full bg-indigo-100 opacity-50 blur-3xl sm:h-72 sm:w-72" />
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Hero Content */}
         <motion.div
@@ -57,11 +69,13 @@ export default function Hero() {
           className="text-center"
         >
 
-          <div className="mb-5 inline-flex rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+          {/* Badge */}
+          <div className="mb-5 inline-flex max-w-full rounded-full bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 sm:px-4 sm:py-2 sm:text-sm">
             Find your next opportunity
           </div>
 
-          <h1 className="text-4xl font-bold leading-tight text-slate-900 sm:text-5xl md:text-6xl">
+          {/* Heading */}
+          <h1 className="text-3xl font-bold leading-tight text-slate-900 sm:text-5xl md:text-6xl">
 
             Find Your
 
@@ -71,7 +85,8 @@ export default function Hero() {
 
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+          {/* Description */}
+          <p className="mx-auto mt-5 max-w-2xl px-2 text-sm leading-6 text-slate-600 sm:mt-6 sm:text-lg sm:leading-7">
             Discover opportunities from trusted recruiters,
             explore exciting careers, and take the next step
             toward your professional goals.
@@ -94,13 +109,13 @@ export default function Hero() {
             delay: 0.3,
             duration: 0.6,
           }}
-          className="mx-auto mt-10 max-w-5xl rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"
+          className="mx-auto mt-8 max-w-5xl rounded-2xl border border-slate-200 bg-white p-2.5 shadow-xl sm:mt-10 sm:p-3"
         >
 
-          <div className="flex flex-col gap-3 lg:flex-row">
+          <div className="flex flex-col gap-2.5 sm:gap-3 lg:flex-row">
 
-            {/* Search input */}
-            <div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 transition focus-within:border-blue-500">
+            {/* Search Input */}
+            <div className="flex min-h-12 flex-1 items-center gap-3 rounded-xl border border-slate-200 px-3.5 transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 sm:px-4">
 
               <FaSearch className="shrink-0 text-slate-400" />
 
@@ -111,13 +126,13 @@ export default function Hero() {
                   setSearch(e.target.value)
                 }
                 placeholder="Job title, skill or keyword"
-                className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                className="min-w-0 w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
               />
 
             </div>
 
-            {/* Location input */}
-            <div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 transition focus-within:border-blue-500">
+            {/* Location Input */}
+            <div className="flex min-h-12 flex-1 items-center gap-3 rounded-xl border border-slate-200 px-3.5 transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 sm:px-4">
 
               <FaMapMarkerAlt className="shrink-0 text-slate-400" />
 
@@ -128,17 +143,18 @@ export default function Hero() {
                   setLocation(e.target.value)
                 }
                 placeholder="Location"
-                className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                className="min-w-0 w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
               />
 
             </div>
 
-            {/* Search button */}
+            {/* Search Button */}
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-3 font-medium text-white transition hover:bg-blue-700 active:scale-[0.98]"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 active:scale-[0.98] lg:w-auto lg:min-w-32"
             >
               Search
+
               <FaArrowRight className="text-sm" />
             </button>
 
@@ -146,7 +162,7 @@ export default function Hero() {
 
         </motion.form>
 
-        {/* Popular searches */}
+        {/* Popular Searches */}
         <motion.div
           initial={{
             opacity: 0,
@@ -157,7 +173,7 @@ export default function Hero() {
           transition={{
             delay: 0.6,
           }}
-          className="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-2 text-sm"
+          className="mx-auto mt-6 flex max-w-4xl flex-wrap items-center justify-center gap-2 px-1 text-xs sm:text-sm"
         >
 
           <span className="text-slate-500">
@@ -173,14 +189,8 @@ export default function Hero() {
             <button
               key={item}
               type="button"
-              onClick={() => {
-                setSearch(item);
-
-                navigate(
-                  `/jobs?search=${encodeURIComponent(item)}`
-                );
-              }}
-              className="rounded-full bg-white px-3 py-1.5 text-slate-600 shadow-sm transition hover:bg-blue-50 hover:text-blue-600"
+              onClick={() => handlePopularSearch(item)}
+              className="rounded-full bg-white px-3 py-2 text-slate-600 shadow-sm transition hover:bg-blue-50 hover:text-blue-600"
             >
               {item}
             </button>

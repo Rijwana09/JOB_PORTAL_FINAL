@@ -44,8 +44,6 @@ class UserController {
           req.body
         );
 
-        console.log("REQ BODY:", req.body);
-
       return res
         .status(200)
         .json(

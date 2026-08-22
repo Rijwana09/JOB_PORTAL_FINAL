@@ -18,6 +18,7 @@ import {
 } from "../../api/applicationApi";
 
 const StudentDashboard = () => {
+
   const [
     dashboard,
     setDashboard,
@@ -28,6 +29,7 @@ const StudentDashboard = () => {
     setLoading,
   ] = useState(true);
 
+
   /*
   |--------------------------------------------------------------------------
   | Fetch Dashboard
@@ -36,7 +38,9 @@ const StudentDashboard = () => {
 
   const fetchDashboard =
     async () => {
+
       try {
+
         setLoading(true);
 
         const response =
@@ -45,7 +49,9 @@ const StudentDashboard = () => {
         setDashboard(
           response.data
         );
+
       } catch (error) {
+
         console.error(
           "Student Dashboard Error:",
           error.response?.data ||
@@ -54,16 +60,24 @@ const StudentDashboard = () => {
 
         toast.error(
           error.response?.data?.message ||
-            "Failed to load dashboard"
+          "Failed to load dashboard"
         );
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
 
+
   useEffect(() => {
+
     fetchDashboard();
+
   }, []);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -72,14 +86,54 @@ const StudentDashboard = () => {
   */
 
   if (loading) {
+
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <p className="text-gray-500">
-          Loading dashboard...
-        </p>
+
+      <div className="min-h-screen bg-gray-50">
+
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+          <div className="animate-pulse">
+
+            {/* Header skeleton */}
+
+            <div className="h-8 w-64 rounded bg-gray-200" />
+
+            <div className="mt-3 h-4 w-72 rounded bg-gray-200" />
+
+
+            {/* Statistics skeleton */}
+
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+
+              {[1, 2, 3, 4, 5].map(
+                (item) => (
+
+                  <div
+                    key={item}
+                    className="h-28 rounded-xl bg-white shadow-sm"
+                  />
+
+                )
+              )}
+
+            </div>
+
+
+            {/* Recent applications skeleton */}
+
+            <div className="mt-8 h-72 rounded-xl bg-white shadow-sm" />
+
+          </div>
+
+        </div>
+
       </div>
+
     );
+
   }
+
 
   /*
   |--------------------------------------------------------------------------
@@ -93,295 +147,436 @@ const StudentDashboard = () => {
   const recentApplications =
     dashboard?.recentApplications || [];
 
+
+  /*
+  |--------------------------------------------------------------------------
+  | Statistic Card
+  |--------------------------------------------------------------------------
+  */
+
+  const statisticCards = [
+
+    {
+      label: "Total",
+      value:
+        statistics.totalApplications || 0,
+      icon: FiBriefcase,
+      iconStyle:
+        "bg-blue-50 text-blue-600",
+    },
+
+    {
+      label: "Applied",
+      value:
+        statistics.applied || 0,
+      icon: FiClock,
+      iconStyle:
+        "bg-yellow-50 text-yellow-600",
+    },
+
+    {
+      label: "Shortlisted",
+      value:
+        statistics.shortlisted || 0,
+      icon: FiCheckCircle,
+      iconStyle:
+        "bg-blue-50 text-blue-600",
+    },
+
+    {
+      label: "Rejected",
+      value:
+        statistics.rejected || 0,
+      icon: FiXCircle,
+      iconStyle:
+        "bg-red-50 text-red-600",
+    },
+
+    {
+      label: "Hired",
+      value:
+        statistics.hired || 0,
+      icon: FiAward,
+      iconStyle:
+        "bg-green-50 text-green-600",
+    },
+
+  ];
+
+
   return (
+
     <div className="min-h-screen bg-gray-50">
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
-        {/* Header */}
+
+        {/* ================================================================
+            HEADER
+        ================================================================= */}
 
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+
             Student Dashboard
+
           </h1>
 
-          <p className="mt-1 text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+
             Track your job applications
+
           </p>
-        </div>
-
-        {/* Statistics */}
-
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-
-          {/* Total */}
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-
-            <div className="flex items-center gap-3">
-
-              <div className="rounded-lg bg-blue-50 p-3 text-blue-600">
-                <FiBriefcase />
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Total
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {
-                    statistics.totalApplications ||
-                    0
-                  }
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Applied */}
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-
-            <div className="flex items-center gap-3">
-
-              <div className="rounded-lg bg-yellow-50 p-3 text-yellow-600">
-                <FiClock />
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Applied
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {
-                    statistics.applied ||
-                    0
-                  }
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Shortlisted */}
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-
-            <div className="flex items-center gap-3">
-
-              <div className="rounded-lg bg-blue-50 p-3 text-blue-600">
-                <FiCheckCircle />
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Shortlisted
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {
-                    statistics.shortlisted ||
-                    0
-                  }
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Rejected */}
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-
-            <div className="flex items-center gap-3">
-
-              <div className="rounded-lg bg-red-50 p-3 text-red-600">
-                <FiXCircle />
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Rejected
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {
-                    statistics.rejected ||
-                    0
-                  }
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Hired */}
-
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-
-            <div className="flex items-center gap-3">
-
-              <div className="rounded-lg bg-green-50 p-3 text-green-600">
-                <FiAward />
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">
-                  Hired
-                </p>
-
-                <p className="text-2xl font-bold">
-                  {
-                    statistics.hired ||
-                    0
-                  }
-                </p>
-              </div>
-
-            </div>
-
-          </div>
 
         </div>
 
-        {/* Recent Applications */}
 
-        <div className="mt-8 rounded-xl bg-white shadow-sm">
+        {/* ================================================================
+            STATISTICS
+        ================================================================= */}
 
-          <div className="border-b px-6 py-5">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5 lg:grid-cols-5">
 
-            <h2 className="text-xl font-semibold">
+
+          {statisticCards.map(
+            (stat) => {
+
+              const Icon =
+                stat.icon;
+
+              return (
+
+                <div
+                  key={stat.label}
+                  className="rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md sm:p-6"
+                >
+
+                  <div className="flex items-center gap-3">
+
+                    <div
+                      className={`shrink-0 rounded-lg p-3 ${stat.iconStyle}`}
+                    >
+
+                      <Icon />
+
+                    </div>
+
+                    <div className="min-w-0">
+
+                      <p className="text-sm text-gray-500">
+
+                        {stat.label}
+
+                      </p>
+
+                      <p className="text-xl font-bold text-gray-900 sm:text-2xl">
+
+                        {stat.value}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              );
+
+            }
+          )}
+
+        </div>
+
+
+        {/* ================================================================
+            RECENT APPLICATIONS
+        ================================================================= */}
+
+        <div className="mt-6 overflow-hidden rounded-xl bg-white shadow-sm sm:mt-8">
+
+
+          {/* Header */}
+
+          <div className="border-b px-4 py-4 sm:px-6 sm:py-5">
+
+            <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
+
               Recent Applications
+
             </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+
               Your latest job applications
+
             </p>
 
           </div>
 
-          {recentApplications.length ===
-          0 ? (
-            <div className="px-6 py-16 text-center">
+
+          {/* Empty State */}
+
+          {recentApplications.length === 0 ? (
+
+            <div className="px-4 py-12 text-center sm:px-6 sm:py-16">
 
               <FiBriefcase
                 className="mx-auto text-4xl text-gray-300"
               />
 
               <h3 className="mt-4 font-semibold text-gray-900">
+
                 No applications yet
+
               </h3>
 
-              <p className="mt-1 text-gray-500">
+              <p className="mt-1 text-sm text-gray-500">
+
                 Start applying for jobs to see them here.
+
               </p>
 
             </div>
+
           ) : (
-            <div className="overflow-x-auto">
 
-              <table className="w-full">
+            <>
 
-                <thead>
-                  <tr className="border-b text-left text-sm text-gray-500">
+              {/* ==========================================================
+                  MOBILE APPLICATION CARDS
+              =========================================================== */}
 
-                    <th className="px-6 py-4">
-                      Job
-                    </th>
+              <div className="divide-y sm:hidden">
 
-                    <th className="px-6 py-4">
-                      Company
-                    </th>
+                {recentApplications.map(
+                  (application) => (
 
-                    <th className="px-6 py-4">
-                      Location
-                    </th>
+                    <div
+                      key={application._id}
+                      className="p-4"
+                    >
 
-                    <th className="px-6 py-4">
-                      Status
-                    </th>
+                      {/* Job */}
 
-                    <th className="px-6 py-4">
-                      Applied On
-                    </th>
+                      <div>
 
-                  </tr>
-                </thead>
+                        <p className="font-semibold text-gray-900">
 
-                <tbody>
+                          {
+                            application
+                              .job
+                              ?.title ||
+                            "Job unavailable"
+                          }
 
-                  {recentApplications.map(
-                    (application) => (
-                      <tr
-                        key={
-                          application._id
-                        }
-                        className="border-b last:border-b-0"
-                      >
+                        </p>
 
-                        <td className="px-6 py-5">
+                        <p className="mt-1 text-sm text-gray-500">
 
-                          <p className="font-medium text-gray-900">
-                            {
-                              application
-                                .job
-                                ?.title ||
-                              "Job unavailable"
-                            }
-                          </p>
-
-                        </td>
-
-                        <td className="px-6 py-5 text-sm text-gray-600">
                           {
                             application
                               .job
                               ?.company ||
                             "-"
                           }
-                        </td>
 
-                        <td className="px-6 py-5 text-sm text-gray-600">
-                          {
-                            application
-                              .job
-                              ?.location ||
-                            "-"
-                          }
-                        </td>
+                        </p>
 
-                        <td className="px-6 py-5">
+                      </div>
 
-                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize">
+
+                      {/* Details */}
+
+                      <div className="mt-4 space-y-3">
+
+                        <div className="flex items-start justify-between gap-4">
+
+                          <span className="text-xs text-gray-400">
+                            Location
+                          </span>
+
+                          <span className="text-right text-sm text-gray-600">
+
+                            {
+                              application
+                                .job
+                                ?.location ||
+                              "-"
+                            }
+
+                          </span>
+
+                        </div>
+
+
+                        <div className="flex items-center justify-between gap-4">
+
+                          <span className="text-xs text-gray-400">
+                            Status
+                          </span>
+
+                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-700">
+
                             {
                               application.status
                             }
+
                           </span>
 
-                        </td>
+                        </div>
 
-                        <td className="px-6 py-5 text-sm text-gray-500">
-                          {new Date(
-                            application.createdAt
-                          ).toLocaleDateString()}
-                        </td>
 
-                      </tr>
-                    )
-                  )}
+                        <div className="flex items-center justify-between gap-4">
 
-                </tbody>
+                          <span className="text-xs text-gray-400">
+                            Applied On
+                          </span>
 
-              </table>
+                          <span className="text-sm text-gray-500">
 
-            </div>
+                            {new Date(
+                              application.createdAt
+                            ).toLocaleDateString()}
+
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+
+              {/* ==========================================================
+                  TABLET / DESKTOP TABLE
+              =========================================================== */}
+
+              <div className="hidden overflow-x-auto sm:block">
+
+                <table className="w-full min-w-[700px]">
+
+                  <thead>
+
+                    <tr className="border-b text-left text-sm text-gray-500">
+
+                      <th className="px-4 py-4 sm:px-6">
+                        Job
+                      </th>
+
+                      <th className="px-4 py-4 sm:px-6">
+                        Company
+                      </th>
+
+                      <th className="px-4 py-4 sm:px-6">
+                        Location
+                      </th>
+
+                      <th className="px-4 py-4 sm:px-6">
+                        Status
+                      </th>
+
+                      <th className="px-4 py-4 sm:px-6">
+                        Applied On
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+
+                  <tbody>
+
+                    {recentApplications.map(
+                      (application) => (
+
+                        <tr
+                          key={
+                            application._id
+                          }
+                          className="border-b last:border-b-0"
+                        >
+
+                          <td className="px-4 py-5 sm:px-6">
+
+                            <p className="font-medium text-gray-900">
+
+                              {
+                                application
+                                  .job
+                                  ?.title ||
+                                "Job unavailable"
+                              }
+
+                            </p>
+
+                          </td>
+
+
+                          <td className="px-4 py-5 text-sm text-gray-600 sm:px-6">
+
+                            {
+                              application
+                                .job
+                                ?.company ||
+                              "-"
+                            }
+
+                          </td>
+
+
+                          <td className="px-4 py-5 text-sm text-gray-600 sm:px-6">
+
+                            {
+                              application
+                                .job
+                                ?.location ||
+                              "-"
+                            }
+
+                          </td>
+
+
+                          <td className="px-4 py-5 sm:px-6">
+
+                            <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-700">
+
+                              {
+                                application.status
+                              }
+
+                            </span>
+
+                          </td>
+
+
+                          <td className="px-4 py-5 text-sm text-gray-500 sm:px-6">
+
+                            {new Date(
+                              application.createdAt
+                            ).toLocaleDateString()}
+
+                          </td>
+
+                        </tr>
+
+                      )
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </>
+
           )}
 
         </div>
@@ -389,7 +584,9 @@ const StudentDashboard = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default StudentDashboard;

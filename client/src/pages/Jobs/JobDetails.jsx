@@ -430,7 +430,7 @@ const JobDetails = () => {
 
       <section className="border-b bg-white">
 
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
           {/* Back */}
 
@@ -447,7 +447,7 @@ const JobDetails = () => {
             onClick={() =>
               navigate("/jobs")
             }
-            className="mb-8 flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
+            className="mb-6 flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
           >
 
             <FiArrowLeft />
@@ -501,12 +501,12 @@ const JobDetails = () => {
               </div>
 
 
-              <h1 className="text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
+              <h1 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl md:text-4xl">
                 {job.title}
               </h1>
 
 
-              <p className="mt-3 text-lg font-medium text-slate-500">
+              <p className="mt-3 break-words text-base font-medium text-slate-500 sm:text-lg">
                 {job.company}
               </p>
 
@@ -532,7 +532,7 @@ const JobDetails = () => {
           CONTENT
       ================================================================= */}
 
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
 
@@ -737,7 +737,7 @@ const JobDetails = () => {
                 delay: 0.2,
                 duration: 0.5,
               }}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 md:p-8"
             >
 
               <h2 className="text-xl font-semibold text-slate-900">
@@ -788,7 +788,7 @@ const JobDetails = () => {
 
                         <span
                           key={skill}
-                          className="rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700"
+                          className="max-w-full break-words rounded-full bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 sm:px-4 sm:text-sm"
                         >
                           {skill}
                         </span>
@@ -826,7 +826,7 @@ const JobDetails = () => {
                 delay: 0.2,
                 duration: 0.5,
               }}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
             >
 
               <h2 className="text-lg font-semibold text-slate-900">
@@ -876,7 +876,7 @@ const JobDetails = () => {
                     isApplied ||
                     authLoading
                   }
-                  className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 font-semibold text-white transition ${
+                  className={`mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold text-white transition sm:text-base ${
                     isApplied
                       ? "cursor-not-allowed bg-green-600"
                       : applying ||
@@ -928,7 +928,7 @@ const JobDetails = () => {
                 onClick={() =>
                   navigate("/jobs")
                 }
-                className="mt-3 w-full rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                className="mt-3 min-h-12 w-full rounded-xl border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 Browse More Jobs
               </button>
