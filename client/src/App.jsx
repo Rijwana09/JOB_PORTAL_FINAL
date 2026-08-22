@@ -25,6 +25,12 @@ import RoleRoute from "./components/Auth/RoleRoute";
 
 import RecruiterDashboard from "./pages/Recruiter/RecruiterDashboard"
 
+import RecruiterProfile from "./pages/Recruiter/RecruiterProfile";
+
+import RecruiterApplications from "./pages/Recruiter/Applications";
+
+import RecruiterApplicationDetails from "./pages/Recruiter/ApplicationDetails";
+
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 
 import ROLES from "./constants/roles";
@@ -39,6 +45,7 @@ import MyApplications from "./pages/Student/MyApplications";
 
 import ApplicationDetails from "./pages/Student/ApplicationDetails";
 
+import StudentProfile from "./pages/Student/StudentProfile";
 
 
 function App() {
@@ -98,6 +105,11 @@ function App() {
             />
 
             <Route
+              path="/student/profile"
+              element={<StudentProfile />}
+            />
+
+            <Route
               path="/student/applications"
               element={<MyApplications />}
             />
@@ -126,6 +138,11 @@ function App() {
             />
 
             <Route
+              path="/recruiter/profile"
+              element={<RecruiterProfile />}
+            />
+
+            <Route
               path="/recruiter/jobs/create"
               element={
                 <CreateJob />
@@ -137,6 +154,16 @@ function App() {
               element={
                 <EditJob />
               }
+            />
+
+            <Route
+                path="/recruiter/applications"
+                element={<RecruiterApplications />}
+            />
+
+              <Route
+                path="/recruiter/applications/:applicationId"
+                element={<RecruiterApplicationDetails />}
             />
 
           </Route>

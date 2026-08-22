@@ -23,22 +23,43 @@ export const applyForJob =
 */
 
 export const getMyApplications =
-  async () => {
+  async ({
+    status = "",
+    sort = "latest",
+    page = 1,
+    limit = 10,
+  } = {}) => {
+
+    const params = {
+      page,
+      limit,
+      sort,
+    };
+
+    if (status) {
+      params.status = status;
+    }
+
     const response =
       await api.get(
-        "/applications/my-applications"
+        "/applications/my-applications",
+        {
+          params,
+        }
       );
+
     return response.data;
   };
 
 /*
 |--------------------------------------------------------------------------
-| Get Application By ID
+| Get Application By ID - Student
 |--------------------------------------------------------------------------
 */
 
 export const getApplicationById =
   async (applicationId) => {
+
     const response =
       await api.get(
         `/applications/${applicationId}`
@@ -55,9 +76,88 @@ export const getApplicationById =
 
 export const getStudentDashboard =
   async () => {
+
     const response =
       await api.get(
         "/applications/dashboard"
+      );
+
+    return response.data;
+  };
+
+
+/*
+|--------------------------------------------------------------------------
+| Get Recruiter Applications
+|--------------------------------------------------------------------------
+*/
+
+export const getRecruiterApplications =
+  async ({
+    status = "",
+    sort = "latest",
+    page = 1,
+    limit = 10,
+  } = {}) => {
+
+    const params = {
+      page,
+      limit,
+      sort,
+    };
+
+    if (status) {
+      params.status = status;
+    }
+
+    const response =
+      await api.get(
+        "/applications/recruiter",
+        {
+          params,
+        }
+      );
+
+    return response.data;
+  };
+
+
+/*
+|--------------------------------------------------------------------------
+| Get Recruiter Application By ID
+|--------------------------------------------------------------------------
+*/
+
+export const getRecruiterApplicationById =
+  async (applicationId) => {
+
+    const response =
+      await api.get(
+        `/applications/recruiter/${applicationId}`
+      );
+
+    return response.data;
+  };
+
+
+/*
+|--------------------------------------------------------------------------
+| Update Recruiter Application Status
+|--------------------------------------------------------------------------
+*/
+
+export const updateApplicationStatus =
+  async (
+    applicationId,
+    status
+  ) => {
+
+    const response =
+      await api.patch(
+        `/applications/recruiter/${applicationId}/status`,
+        {
+          status,
+        }
       );
 
     return response.data;

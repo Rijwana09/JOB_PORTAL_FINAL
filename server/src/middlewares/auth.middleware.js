@@ -40,12 +40,19 @@ const protect = asyncHandler(async (req, res, next) => {
 
   const user = await User.findById(decoded.id);
 
-  if (!user) {
-    throw new ApiError(
-      401,
-      "User not found"
-    );
-  }
+if (!user) {
+  throw new ApiError(
+    401,
+    "User not found"
+  );
+}
+
+if (!user.isActive) {
+  throw new ApiError(
+    403,
+    "Your account has been deactivated"
+  );
+}
 
   req.user = {
     id: user.id,
@@ -53,9 +60,11 @@ const protect = asyncHandler(async (req, res, next) => {
     email: user.email,
     role: user.role,
     isVerified: user.isVerified,
+    isActive: user.isActive,
   };
 
   next();
+
 });
 
 export default protect;

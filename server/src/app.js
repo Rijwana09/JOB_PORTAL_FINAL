@@ -16,6 +16,10 @@ import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import userRoutes from "./routes/user.routes.js";
+
+
 const app = express();
 
 app.use(
@@ -58,6 +62,9 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/applications", applicationRoutes);
 app.use("/api/v1/notifications",notificationRoutes);
+app.use("/api/v1/users",userRoutes);
+app.use("/api/v1/admin",adminRoutes);
+
 
 app.use(notFound);
 
